@@ -1,0 +1,64 @@
+{
+  "name": "CodeXana",
+  "author": "MrXANA91",
+  "version": "0.1.0",
+  "keywords": [
+    "pebble-watchface",
+    "watchface",
+    "code lyoko",
+    "lyoko",
+    "xana"
+  ],
+  "private": true,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "CODE XANA",
+    "uuid": "4d490494-b180-49ff-9252-72e1e4c9ac26",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "aplite",
+      "diorite"
+    ],
+    "watchapp": {
+      "watchface": true
+    },
+    "messageKeys": [
+      "Analog",
+      "LogoHand",
+      "DarkMode"
+    ],
+    "resources": {
+      "media": [
+        {
+          "type": "font",
+          "name": "FONT_GUNSHIP_30",
+          "file": "fonts/gun4f.ttf",
+          "compatibilty": "2.7"
+        },
+        {
+          "type": "font",
+          "name": "FONT_GUNSHIP_14",
+          "file": "fonts/gun4f.ttf",
+          "compatibilty": "2.7"
+        },
+        {
+          "type": "font",
+          "name": "FONT_GUNSHIP_10",
+          "file": "fonts/gun4f.ttf",
+          "compatibilty": "2.7"
+        },
+        {
+          "type": "bitmap",
+          "name": "XANA_WHITE",
+          "file": "images/xana_white_57x91.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "XANA_BLACK",
+          "file": "images/xana_black_57x91.png"
+        }
+      ]
+    }
+  }
+}
