@@ -4,6 +4,8 @@ void default_settings(ClaySettings *settings) {
     settings->BackgroundColor = GColorWhite;
     settings->ForegroundColor = GColorBlack;
     settings->ShowLogo = true;
+    settings->InvertLogoStateOnDisconnect = true;
+    settings->VibrateOnDisconnect = false;
 }
 
 void save_settings(ClaySettings *settings) {

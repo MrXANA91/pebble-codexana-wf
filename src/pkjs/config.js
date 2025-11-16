@@ -29,7 +29,7 @@ module.exports = [
     "items": [
       {
         "type": "heading",
-        "defaultValue": "More Settings"
+        "defaultValue": "Logo behavior"
       },
       {
         "type": "toggle",
@@ -39,10 +39,26 @@ module.exports = [
       },
       {
         "type": "toggle",
-        "messageKey": "HideLogoOnDisconnect",
-        "label": "Hide Logo when phone connection is lost",
-        "defaultValue": true
+        "messageKey": "InvertLogoStateOnDisconnect",
+        "label": "Invert Logo state when phone connection is lost",
+        "defaultValue": true,
+        "description": "This will invert the default state of the logo when losing phone connection. For example, if 'Show Logo' is disable and this is enabled, logo will appear when connection is lost. By default, logo will disappear when connection is lost."
       }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "More options"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "VibrateOnDisconnect",
+        "label": "Vibrate on disconnect",
+        "defaultValue": false
+      },
     ]
   },
   {

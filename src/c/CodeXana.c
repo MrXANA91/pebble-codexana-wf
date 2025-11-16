@@ -35,9 +35,14 @@ static void prv_inbox_received_handler(DictionaryIterator *iter, void *context) 
     settings.ShowLogo = show_logo_t->value->int32 == 1;
   }
 
-  Tuple *hide_logo_on_disc = dict_find(iter, MESSAGE_KEY_HideLogoOnDisconnect);
+  Tuple *hide_logo_on_disc = dict_find(iter, MESSAGE_KEY_InvertLogoStateOnDisconnect);
   if(hide_logo_on_disc) {
-    settings.HideLogoOnDisconnect = hide_logo_on_disc->value->int32 == 1;
+    settings.InvertLogoStateOnDisconnect = hide_logo_on_disc->value->int32 == 1;
+  }
+
+  Tuple *vibrate_on_disc = dict_find(iter, MESSAGE_KEY_VibrateOnDisconnect);
+  if (vibrate_on_disc) {
+    settings.VibrateOnDisconnect = vibrate_on_disc->value->int32 == 1;
   }
 
   save_settings(&settings);
@@ -67,8 +72,14 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 }
 
 static void bluetooth_callback(bool connected) {
-  if (settings.ShowLogo) {
-    layer_set_hidden(bitmap_layer_get_layer(s_xana_layer), !connected);
+  if (settings.InvertLogoStateOnDisconnect && (settings.BackgroundColor.argb != settings.ForegroundColor.argb)) {
+    bool hide = connected ? !settings.ShowLogo : settings.ShowLogo;
+
+    layer_set_hidden(bitmap_layer_get_layer(s_xana_layer), hide);
+  }
+
+  if (settings.VibrateOnDisconnect && !connected) {
+    vibes_double_pulse();
   }
 }
 

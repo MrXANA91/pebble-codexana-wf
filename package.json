@@ -29,7 +29,8 @@
       "BackgroundColor",
       "ForegroundColor",
       "ShowLogo",
-      "HideLogoOnDisconnect"
+      "InvertLogoStateOnDisconnect",
+      "VibrateOnDisconnect"
     ],
     "capabilities": [
       "configurable"

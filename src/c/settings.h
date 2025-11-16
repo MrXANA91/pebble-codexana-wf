@@ -8,7 +8,8 @@ typedef struct {
     GColor BackgroundColor;
     GColor ForegroundColor;
     bool ShowLogo;
-    bool HideLogoOnDisconnect;
+    bool InvertLogoStateOnDisconnect;
+    bool VibrateOnDisconnect;
 } ClaySettings;
 
 void default_settings(ClaySettings *settings);
