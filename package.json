@@ -10,9 +10,11 @@
     "xana"
   ],
   "private": true,
-  "dependencies": {},
+  "dependencies": {
+    "pebble-clay": "^1.0.4"
+  },
   "pebble": {
-    "displayName": "CODE XANA",
+    "displayName": "Code XANA",
     "uuid": "4d490494-b180-49ff-9252-72e1e4c9ac26",
     "sdkVersion": "3",
     "enableMultiJS": true,
@@ -24,9 +26,13 @@
       "watchface": true
     },
     "messageKeys": [
-      "Analog",
-      "LogoHand",
-      "DarkMode"
+      "BackgroundColor",
+      "ForegroundColor",
+      "ShowLogo",
+      "HideLogoOnDisconnect"
+    ],
+    "capabilities": [
+      "configurable"
     ],
     "resources": {
       "media": [
