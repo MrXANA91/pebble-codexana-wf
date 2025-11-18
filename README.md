@@ -12,7 +12,8 @@ Code XANA watchface for Pebble watches
 Other models will be compatible in future releases.
 
 ## Installation
-Watchface will be available on the Pebble appstore in the near future.
+Download [here](https://apps.rebble.io/en_US/application/691ccd3ff5dd2700091a4ff2) from the Pebble appstore.
+Or sideload using the ` .pbw` file in the release section.
 
 ## Contributing
 Issues and pull requests are welcome.
