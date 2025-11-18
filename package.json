@@ -20,6 +20,7 @@
     "enableMultiJS": true,
     "targetPlatforms": [
       "aplite",
+      "basalt",
       "diorite"
     ],
     "watchapp": {
@@ -40,19 +41,19 @@
         {
           "type": "font",
           "name": "FONT_GUNSHIP_30",
-          "file": "fonts/gun4f.ttf",
+          "file": "fonts/gunship.ttf",
           "compatibilty": "2.7"
         },
         {
           "type": "font",
           "name": "FONT_GUNSHIP_14",
-          "file": "fonts/gun4f.ttf",
+          "file": "fonts/gunship.ttf",
           "compatibilty": "2.7"
         },
         {
           "type": "font",
           "name": "FONT_GUNSHIP_10",
-          "file": "fonts/gun4f.ttf",
+          "file": "fonts/gunship.ttf",
           "compatibilty": "2.7"
         },
         {
