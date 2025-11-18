@@ -13,13 +13,13 @@ module.exports = [
       {
         "type": "color",
         "messageKey": "BackgroundColor",
-        "defaultValue": "0x000000",
+        "defaultValue": "0xFFFFFF",
         "label": "Background Color"
       },
       {
         "type": "color",
         "messageKey": "ForegroundColor",
-        "defaultValue": "0xFFFFFF",
+        "defaultValue": "0x000000",
         "label": "Foreground Color"
       }
     ]
