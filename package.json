@@ -1,7 +1,7 @@
 {
   "name": "CodeXana",
   "author": "MrXANA91",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "keywords": [
     "pebble-watchface",
     "watchface",
@@ -39,6 +39,13 @@
     "resources": {
       "media": [
         {
+          "menuIcon": true,
+          "type": "bitmap",
+          "name": "IMAGE_MENU_ICON",
+          "file": "images/appicon_25x25.png",
+          "memoryFormat": "1Bit"
+        },
+        {
           "type": "font",
           "name": "FONT_GUNSHIP_30",
           "file": "fonts/gunship.ttf",
@@ -58,13 +65,8 @@
         },
         {
           "type": "bitmap",
-          "name": "XANA_WHITE",
-          "file": "images/xana_white_57x91.png"
-        },
-        {
-          "type": "bitmap",
-          "name": "XANA_BLACK",
-          "file": "images/xana_black_57x91.png"
+          "name": "XANA",
+          "file": "images/xana_57x91.png"
         }
       ]
     }

@@ -5,8 +5,8 @@
 static Window *s_window;
 
 static BitmapLayer *s_xana_layer;
-static GBitmap *s_xana_white_bitmap;
-static GBitmap *s_xana_black_bitmap;
+static GBitmap *s_xana_bitmap;
+static GColor *s_xana_color;
 
 static GFont s_dig_time_font;
 static TextLayer *s_dig_time_layer;
@@ -72,7 +72,7 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 }
 
 static void bluetooth_callback(bool connected) {
-  if (settings.InvertLogoStateOnDisconnect && (settings.BackgroundColor.argb != settings.ForegroundColor.argb)) {
+  if (settings.InvertLogoStateOnDisconnect) {
     bool hide = connected ? !settings.ShowLogo : settings.ShowLogo;
 
     layer_set_hidden(bitmap_layer_get_layer(s_xana_layer), hide);
@@ -83,15 +83,55 @@ static void bluetooth_callback(bool connected) {
   }
 }
 
+static void prv_get_black_palette(GBitmap* bitmap) {
+  s_xana_color = NULL;
+  if (!bitmap) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "No bitmap");
+    return;
+  }
+  GColor *palette_array = gbitmap_get_palette(bitmap);
+  if (!palette_array) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "No palette");
+    return;
+  }
+  // Get the bitmap format to determine palette size
+  GBitmapFormat format = gbitmap_get_format(bitmap);
+  int palette_size = 0;
+  switch (format)
+  {
+    case GBitmapFormat1BitPalette:
+      palette_size = 2;
+      break;
+    case GBitmapFormat2BitPalette:
+      palette_size = 4;
+      break;
+    case GBitmapFormat4BitPalette:
+      palette_size = 16;
+      break;
+    default:
+      APP_LOG(APP_LOG_LEVEL_ERROR, "Not a palette-based format, can't invert");
+      return;
+  }
+  // Retrieving 
+  for (int i = 0; i < palette_size; i++)
+  {
+    if (gcolor_equal(palette_array[i], GColorBlack))
+    {
+      s_xana_color = &palette_array[i];
+      return;
+    }
+  }
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Unable to set palette");
+  return;
+}
+
 static void prv_update_display() {
   window_set_background_color(s_window, settings.BackgroundColor);
-
-  if (settings.BackgroundColor.argb == GColorBlack.argb) {
-    bitmap_layer_set_bitmap(s_xana_layer, s_xana_black_bitmap);
-  } else {
-    bitmap_layer_set_bitmap(s_xana_layer, s_xana_white_bitmap);
+  bitmap_layer_set_background_color(s_xana_layer, settings.BackgroundColor);
+  if (s_xana_color) {
+    *s_xana_color = settings.ForegroundColor;
   }
-  layer_set_hidden(bitmap_layer_get_layer(s_xana_layer), !settings.ShowLogo || (settings.BackgroundColor.argb == settings.ForegroundColor.argb));
+  layer_set_hidden(bitmap_layer_get_layer(s_xana_layer), !settings.ShowLogo);
 
   text_layer_set_background_color(s_dig_time_layer, settings.BackgroundColor);
   text_layer_set_text_color(s_dig_time_layer, settings.ForegroundColor);
@@ -105,9 +145,11 @@ static void prv_window_load(Window *window) {
   GRect bounds = layer_get_bounds(window_layer);
 
   // XANA logo
-  s_xana_black_bitmap = gbitmap_create_with_resource(RESOURCE_ID_XANA_BLACK);
-  s_xana_white_bitmap = gbitmap_create_with_resource(RESOURCE_ID_XANA_WHITE);
+  s_xana_bitmap = gbitmap_create_with_resource(RESOURCE_ID_XANA);
+  prv_get_black_palette(s_xana_bitmap);
   s_xana_layer = bitmap_layer_create(bounds);
+  bitmap_layer_set_bitmap(s_xana_layer, s_xana_bitmap);
+  bitmap_layer_set_compositing_mode(s_xana_layer, GCompOpSet);
   layer_add_child(window_layer, bitmap_layer_get_layer(s_xana_layer));
 
   // Digital text
@@ -133,11 +175,12 @@ static void prv_window_load(Window *window) {
 }
 
 static void prv_window_unload(Window *window) {
-  gbitmap_destroy(s_xana_white_bitmap);
-  gbitmap_destroy(s_xana_black_bitmap);
+  gbitmap_destroy(s_xana_bitmap);
   bitmap_layer_destroy(s_xana_layer);
   fonts_unload_custom_font(s_dig_time_font);
+  fonts_unload_custom_font(s_dig_date_font);
   text_layer_destroy(s_dig_time_layer);
+  text_layer_destroy(s_dig_date_layer);
 }
 
 static void prv_init(void) {
