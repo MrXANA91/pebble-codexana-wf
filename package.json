@@ -1,7 +1,7 @@
 {
   "name": "CodeXana",
   "author": "MrXANA91",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "keywords": [
     "pebble-watchface",
     "watchface",
@@ -47,19 +47,13 @@
         },
         {
           "type": "font",
-          "name": "FONT_GUNSHIP_30",
+          "name": "FONT_GUNSHIP_33",
           "file": "fonts/gunship.ttf",
           "compatibilty": "2.7"
         },
         {
           "type": "font",
-          "name": "FONT_GUNSHIP_14",
-          "file": "fonts/gunship.ttf",
-          "compatibilty": "2.7"
-        },
-        {
-          "type": "font",
-          "name": "FONT_GUNSHIP_10",
+          "name": "FONT_GUNSHIP_26",
           "file": "fonts/gunship.ttf",
           "compatibilty": "2.7"
         },

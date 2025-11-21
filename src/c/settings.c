@@ -1,10 +1,15 @@
 #include "settings.h"
 
 void default_settings(ClaySettings *settings) {
+    // Colors
     settings->BackgroundColor = GColorWhite;
     settings->ForegroundColor = GColorBlack;
+
+    // Logo
     settings->ShowLogo = true;
     settings->InvertLogoStateOnDisconnect = true;
+
+    // Misc
     settings->VibrateOnDisconnect = false;
 }
 

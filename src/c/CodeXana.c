@@ -9,7 +9,10 @@ static GBitmap *s_xana_bitmap;
 static GColor *s_xana_color;
 
 static GFont s_dig_time_font;
-static TextLayer *s_dig_time_layer;
+static TextLayer *s_dig_time_hours_layer;
+static TextLayer *s_dig_time_colon_layer;
+static TextLayer *s_dig_time_minutes_layer;
+
 static GFont s_dig_date_font;
 static TextLayer *s_dig_date_layer;
 
@@ -18,7 +21,7 @@ static ClaySettings settings;
 static void prv_update_display();
 
 static void prv_inbox_received_handler(DictionaryIterator *iter, void *context) {
-  // Read color preferences
+  // Colors
   Tuple *bg_color_t = dict_find(iter, MESSAGE_KEY_BackgroundColor);
   if(bg_color_t) {
     settings.BackgroundColor = GColorFromHEX(bg_color_t->value->int32);
@@ -29,7 +32,7 @@ static void prv_inbox_received_handler(DictionaryIterator *iter, void *context) 
     settings.ForegroundColor = GColorFromHEX(fg_color_t->value->int32);
   }
 
-  // Read boolean preferences
+  // Logo
   Tuple *show_logo_t = dict_find(iter, MESSAGE_KEY_ShowLogo);
   if(show_logo_t) {
     settings.ShowLogo = show_logo_t->value->int32 == 1;
@@ -40,6 +43,7 @@ static void prv_inbox_received_handler(DictionaryIterator *iter, void *context) 
     settings.InvertLogoStateOnDisconnect = hide_logo_on_disc->value->int32 == 1;
   }
 
+  // Misc
   Tuple *vibrate_on_disc = dict_find(iter, MESSAGE_KEY_VibrateOnDisconnect);
   if (vibrate_on_disc) {
     settings.VibrateOnDisconnect = vibrate_on_disc->value->int32 == 1;
@@ -58,12 +62,15 @@ static void update_time() {
 
   // Write the current hours and minutes into a buffer
   // Display this time on the TextLayer
-  static char s_buffer[8];
-  strftime(s_buffer, sizeof(s_buffer), clock_is_24h_style() ? "%H:%M" : "%I:%M", current_time);
-  text_layer_set_text(s_dig_time_layer, s_buffer);
-
+  static char s_hours_buffer[6];
+  static char s_minutes_buffer[6];
   static char s_date_buffer[12];
-  strftime(s_date_buffer, sizeof(s_date_buffer), "%F", current_time);
+
+  strftime(s_hours_buffer, sizeof(s_hours_buffer), clock_is_24h_style() ? "%H" : "%I", current_time);
+  text_layer_set_text(s_dig_time_hours_layer, s_hours_buffer);
+  strftime(s_minutes_buffer, sizeof(s_minutes_buffer), "%M", current_time);
+  text_layer_set_text(s_dig_time_minutes_layer, s_minutes_buffer);
+  strftime(s_date_buffer, sizeof(s_date_buffer), "%a %d", current_time);
   text_layer_set_text(s_dig_date_layer, s_date_buffer);
 }
 
@@ -133,8 +140,12 @@ static void prv_update_display() {
   }
   layer_set_hidden(bitmap_layer_get_layer(s_xana_layer), !settings.ShowLogo);
 
-  text_layer_set_background_color(s_dig_time_layer, settings.BackgroundColor);
-  text_layer_set_text_color(s_dig_time_layer, settings.ForegroundColor);
+  text_layer_set_background_color(s_dig_time_hours_layer, settings.BackgroundColor);
+  text_layer_set_text_color(s_dig_time_hours_layer, settings.ForegroundColor);
+  text_layer_set_background_color(s_dig_time_colon_layer, settings.BackgroundColor);
+  text_layer_set_text_color(s_dig_time_colon_layer, settings.ForegroundColor);
+  text_layer_set_background_color(s_dig_time_minutes_layer, settings.BackgroundColor);
+  text_layer_set_text_color(s_dig_time_minutes_layer, settings.ForegroundColor);
 
   text_layer_set_background_color(s_dig_date_layer, settings.BackgroundColor);
   text_layer_set_text_color(s_dig_date_layer, settings.ForegroundColor);
@@ -153,18 +164,34 @@ static void prv_window_load(Window *window) {
   layer_add_child(window_layer, bitmap_layer_get_layer(s_xana_layer));
 
   // Digital text
-  s_dig_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GUNSHIP_30));
-  s_dig_time_layer = text_layer_create(
-    GRect(0, 124, bounds.size.w, 40)
+  s_dig_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GUNSHIP_33));
+  s_dig_time_hours_layer = text_layer_create(
+    GRect(0, 124, (bounds.size.w / 2) - 5, 40)
   );
-  text_layer_set_font(s_dig_time_layer, s_dig_time_font);
-  text_layer_set_text_alignment(s_dig_time_layer, GTextAlignmentCenter);
-  text_layer_set_text(s_dig_time_layer, "00:00");
-  layer_add_child(window_layer, text_layer_get_layer(s_dig_time_layer));
+  text_layer_set_font(s_dig_time_hours_layer, s_dig_time_font);
+  text_layer_set_text_alignment(s_dig_time_hours_layer, GTextAlignmentRight);
+  text_layer_set_text(s_dig_time_hours_layer, "00");
+  layer_add_child(window_layer, text_layer_get_layer(s_dig_time_hours_layer));
 
-  s_dig_date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GUNSHIP_14));
+  s_dig_time_minutes_layer = text_layer_create(
+    GRect((bounds.size.w / 2) + 5, 124, (bounds.size.w / 2) - 5, 40)
+  );
+  text_layer_set_font(s_dig_time_minutes_layer, s_dig_time_font);
+  text_layer_set_text_alignment(s_dig_time_minutes_layer, GTextAlignmentLeft);
+  text_layer_set_text(s_dig_time_minutes_layer, "00");
+  layer_add_child(window_layer, text_layer_get_layer(s_dig_time_minutes_layer));
+
+  s_dig_time_colon_layer = text_layer_create(
+    GRect((bounds.size.w / 2) - 5, 124, 10, 40)
+  );
+  text_layer_set_font(s_dig_time_colon_layer, s_dig_time_font);
+  text_layer_set_text_alignment(s_dig_time_colon_layer, GTextAlignmentCenter);
+  text_layer_set_text(s_dig_time_colon_layer, ":");
+  layer_add_child(window_layer, text_layer_get_layer(s_dig_time_colon_layer));
+
+  s_dig_date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GUNSHIP_26));
   s_dig_date_layer = text_layer_create(
-    GRect(0, 10, bounds.size.w, 20)
+    GRect(0, 0, bounds.size.w, 40)
   );
   text_layer_set_font(s_dig_date_layer, s_dig_date_font);
   text_layer_set_text_alignment(s_dig_date_layer, GTextAlignmentCenter);
@@ -179,7 +206,9 @@ static void prv_window_unload(Window *window) {
   bitmap_layer_destroy(s_xana_layer);
   fonts_unload_custom_font(s_dig_time_font);
   fonts_unload_custom_font(s_dig_date_font);
-  text_layer_destroy(s_dig_time_layer);
+  text_layer_destroy(s_dig_time_hours_layer);
+  text_layer_destroy(s_dig_time_colon_layer);
+  text_layer_destroy(s_dig_time_minutes_layer);
   text_layer_destroy(s_dig_date_layer);
 }
 
@@ -192,7 +221,7 @@ static void prv_init(void) {
   const bool animated = true;
   window_stack_push(s_window, animated);
 
-  tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
+  tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
 
   connection_service_subscribe((ConnectionHandlers) {
     .pebble_app_connection_handler = bluetooth_callback
