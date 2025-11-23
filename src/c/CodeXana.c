@@ -6,7 +6,9 @@ static Window *s_window;
 
 static BitmapLayer *s_xana_layer;
 static GBitmap *s_xana_bitmap;
+static GBitmap *s_xana_void_bitmap;
 static GColor *s_xana_color;
+static GColor *s_xana_void_color;
 
 static GFont s_dig_time_font;
 static TextLayer *s_dig_time_hours_layer;
@@ -82,7 +84,12 @@ static void bluetooth_callback(bool connected) {
   if (settings.InvertLogoStateOnDisconnect) {
     bool hide = connected ? !settings.ShowLogo : settings.ShowLogo;
 
-    layer_set_hidden(bitmap_layer_get_layer(s_xana_layer), hide);
+    // layer_set_hidden(bitmap_layer_get_layer(s_xana_layer), hide);
+    if (hide) {
+      bitmap_layer_set_bitmap(s_xana_layer, s_xana_void_bitmap);
+    } else {
+      bitmap_layer_set_bitmap(s_xana_layer, s_xana_bitmap);
+    }
   }
 
   if (settings.VibrateOnDisconnect && !connected) {
@@ -90,15 +97,22 @@ static void bluetooth_callback(bool connected) {
   }
 }
 
-static void prv_get_black_palette(GBitmap* bitmap) {
-  s_xana_color = NULL;
+/// @brief Get the pointer to the black color in the bitmap palette
+/// @param palette 
+/// @param bitmap 
+/// @attention Original code from [EurophoricPenguin/Fiftyeight](https://github.com/EuphoricPenguin/Fiftyeight/blob/main/src/c/fiftyeight.c)
+static void prv_get_black_palette(GColor **palette_ptr_ptr, GBitmap* bitmap) {
+  if (!palette_ptr_ptr) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "No dest palette");
+    return;
+  }
   if (!bitmap) {
     APP_LOG(APP_LOG_LEVEL_ERROR, "No bitmap");
     return;
   }
   GColor *palette_array = gbitmap_get_palette(bitmap);
   if (!palette_array) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "No palette");
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Bitmap has no palette");
     return;
   }
   // Get the bitmap format to determine palette size
@@ -124,7 +138,7 @@ static void prv_get_black_palette(GBitmap* bitmap) {
   {
     if (gcolor_equal(palette_array[i], GColorBlack))
     {
-      s_xana_color = &palette_array[i];
+      *palette_ptr_ptr = &palette_array[i];
       return;
     }
   }
@@ -137,6 +151,9 @@ static void prv_update_display() {
   bitmap_layer_set_background_color(s_xana_layer, settings.BackgroundColor);
   if (s_xana_color) {
     *s_xana_color = settings.ForegroundColor;
+  }
+  if (s_xana_void_color) {
+    *s_xana_void_color = settings.ForegroundColor;
   }
   layer_set_hidden(bitmap_layer_get_layer(s_xana_layer), !settings.ShowLogo);
 
@@ -157,7 +174,9 @@ static void prv_window_load(Window *window) {
 
   // XANA logo
   s_xana_bitmap = gbitmap_create_with_resource(RESOURCE_ID_XANA);
-  prv_get_black_palette(s_xana_bitmap);
+  s_xana_void_bitmap = gbitmap_create_with_resource(RESOURCE_ID_XANA_VOID);
+  prv_get_black_palette(&s_xana_color, s_xana_bitmap);
+  prv_get_black_palette(&s_xana_void_color, s_xana_void_bitmap);
   s_xana_layer = bitmap_layer_create(bounds);
   bitmap_layer_set_bitmap(s_xana_layer, s_xana_bitmap);
   bitmap_layer_set_compositing_mode(s_xana_layer, GCompOpSet);
@@ -203,6 +222,7 @@ static void prv_window_load(Window *window) {
 
 static void prv_window_unload(Window *window) {
   gbitmap_destroy(s_xana_bitmap);
+  gbitmap_destroy(s_xana_void_bitmap);
   bitmap_layer_destroy(s_xana_layer);
   fonts_unload_custom_font(s_dig_time_font);
   fonts_unload_custom_font(s_dig_date_font);

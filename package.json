@@ -61,6 +61,11 @@
           "type": "bitmap",
           "name": "XANA",
           "file": "images/xana_57x91.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "XANA_VOID",
+          "file": "images/xana_void_57x91.png"
         }
       ]
     }
