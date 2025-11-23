@@ -2,6 +2,8 @@
 
 #include <pebble.h>
 
+// #define DEBUG
+
 static Window *s_window;
 
 static BitmapLayer *s_xana_layer;
@@ -10,13 +12,15 @@ static GBitmap *s_xana_void_bitmap;
 static GColor *s_xana_color;
 static GColor *s_xana_void_color;
 
-static GFont s_dig_time_font;
-static TextLayer *s_dig_time_hours_layer;
-static TextLayer *s_dig_time_colon_layer;
-static TextLayer *s_dig_time_minutes_layer;
+static GFont s_time_font;
+static TextLayer *s_time_dhours_layer;
+static TextLayer *s_time_hours_layer;
+static TextLayer *s_time_colon_layer;
+static TextLayer *s_time_dminutes_layer;
+static TextLayer *s_time_minutes_layer;
 
-static GFont s_dig_date_font;
-static TextLayer *s_dig_date_layer;
+static GFont s_date_font;
+static TextLayer *s_date_layer;
 
 static ClaySettings settings;
 
@@ -64,16 +68,36 @@ static void update_time() {
 
   // Write the current hours and minutes into a buffer
   // Display this time on the TextLayer
-  static char s_hours_buffer[6];
-  static char s_minutes_buffer[6];
+  static char s_hours_buffer[3];
+  static char s_dhours_buffer[3];
+  static char s_minutes_buffer[3];
+  static char s_dminutes_buffer[3];
   static char s_date_buffer[12];
 
-  strftime(s_hours_buffer, sizeof(s_hours_buffer), clock_is_24h_style() ? "%H" : "%I", current_time);
-  text_layer_set_text(s_dig_time_hours_layer, s_hours_buffer);
-  strftime(s_minutes_buffer, sizeof(s_minutes_buffer), "%M", current_time);
-  text_layer_set_text(s_dig_time_minutes_layer, s_minutes_buffer);
+  #ifdef DEBUG
+  static int counter = 0;
+  counter++;
+  snprintf(s_dhours_buffer, sizeof(s_dhours_buffer), "%02d", counter % 24);
+  snprintf(s_dminutes_buffer, sizeof(s_dminutes_buffer), "%02d", counter % 60);
+  #else
+  strftime(s_dhours_buffer, sizeof(s_dhours_buffer), clock_is_24h_style() ? "%H" : "%I", current_time);
+  strftime(s_dminutes_buffer, sizeof(s_dminutes_buffer), "%M", current_time);
+  #endif
+
+  s_hours_buffer[0] = s_dhours_buffer[1];
+  s_hours_buffer[1] = 0x00;
+  s_dhours_buffer[1] = 0x00;
+  s_minutes_buffer[0] = s_dminutes_buffer[1];
+  s_minutes_buffer[1] = 0x00;
+  s_dminutes_buffer[1] = 0x00;
+
+  text_layer_set_text(s_time_dhours_layer, s_dhours_buffer);
+  text_layer_set_text(s_time_hours_layer, s_hours_buffer);
+  text_layer_set_text(s_time_dminutes_layer, s_dminutes_buffer);
+  text_layer_set_text(s_time_minutes_layer, s_minutes_buffer);
+
   strftime(s_date_buffer, sizeof(s_date_buffer), "%a %d", current_time);
-  text_layer_set_text(s_dig_date_layer, s_date_buffer);
+  text_layer_set_text(s_date_layer, s_date_buffer);
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
@@ -157,20 +181,24 @@ static void prv_update_display() {
   }
   layer_set_hidden(bitmap_layer_get_layer(s_xana_layer), !settings.ShowLogo);
 
-  text_layer_set_background_color(s_dig_time_hours_layer, settings.BackgroundColor);
-  text_layer_set_text_color(s_dig_time_hours_layer, settings.ForegroundColor);
-  text_layer_set_background_color(s_dig_time_colon_layer, settings.BackgroundColor);
-  text_layer_set_text_color(s_dig_time_colon_layer, settings.ForegroundColor);
-  text_layer_set_background_color(s_dig_time_minutes_layer, settings.BackgroundColor);
-  text_layer_set_text_color(s_dig_time_minutes_layer, settings.ForegroundColor);
+  text_layer_set_background_color(s_time_hours_layer, settings.BackgroundColor);
+  text_layer_set_text_color(s_time_hours_layer, settings.ForegroundColor);
+  text_layer_set_background_color(s_time_dhours_layer, settings.BackgroundColor);
+  text_layer_set_text_color(s_time_dhours_layer, settings.ForegroundColor);
+  text_layer_set_background_color(s_time_colon_layer, settings.BackgroundColor);
+  text_layer_set_text_color(s_time_colon_layer, settings.ForegroundColor);
+  text_layer_set_background_color(s_time_minutes_layer, settings.BackgroundColor);
+  text_layer_set_text_color(s_time_minutes_layer, settings.ForegroundColor);
+  text_layer_set_background_color(s_time_dminutes_layer, settings.BackgroundColor);
+  text_layer_set_text_color(s_time_dminutes_layer, settings.ForegroundColor);
 
-  text_layer_set_background_color(s_dig_date_layer, settings.BackgroundColor);
-  text_layer_set_text_color(s_dig_date_layer, settings.ForegroundColor);
+  text_layer_set_background_color(s_date_layer, settings.BackgroundColor);
+  text_layer_set_text_color(s_date_layer, settings.ForegroundColor);
 }
 
 static void prv_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
-  GRect bounds = layer_get_bounds(window_layer);
+  GRect bounds = layer_get_unobstructed_bounds(window_layer);
 
   // XANA logo
   s_xana_bitmap = gbitmap_create_with_resource(RESOURCE_ID_XANA);
@@ -182,40 +210,55 @@ static void prv_window_load(Window *window) {
   bitmap_layer_set_compositing_mode(s_xana_layer, GCompOpSet);
   layer_add_child(window_layer, bitmap_layer_get_layer(s_xana_layer));
 
-  // Digital text
-  s_dig_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GUNSHIP_33));
-  s_dig_time_hours_layer = text_layer_create(
-    GRect(0, 124, (bounds.size.w / 2) - 5, 40)
+  // Time
+  s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GUNSHIP_33));
+  s_time_dhours_layer = text_layer_create(
+    GRect(0, 124, ((bounds.size.w / 2) - 5) / 2, 40)
   );
-  text_layer_set_font(s_dig_time_hours_layer, s_dig_time_font);
-  text_layer_set_text_alignment(s_dig_time_hours_layer, GTextAlignmentRight);
-  text_layer_set_text(s_dig_time_hours_layer, "00");
-  layer_add_child(window_layer, text_layer_get_layer(s_dig_time_hours_layer));
-
-  s_dig_time_minutes_layer = text_layer_create(
-    GRect((bounds.size.w / 2) + 5, 124, (bounds.size.w / 2) - 5, 40)
+  text_layer_set_font(s_time_dhours_layer, s_time_font);
+  text_layer_set_text_alignment(s_time_dhours_layer, GTextAlignmentCenter);
+  text_layer_set_text(s_time_dhours_layer, "0");
+  layer_add_child(window_layer, text_layer_get_layer(s_time_dhours_layer));
+  s_time_hours_layer = text_layer_create(
+    GRect(((bounds.size.w / 2) - 5) / 2, 124, ((bounds.size.w / 2) - 5) / 2, 40)
   );
-  text_layer_set_font(s_dig_time_minutes_layer, s_dig_time_font);
-  text_layer_set_text_alignment(s_dig_time_minutes_layer, GTextAlignmentLeft);
-  text_layer_set_text(s_dig_time_minutes_layer, "00");
-  layer_add_child(window_layer, text_layer_get_layer(s_dig_time_minutes_layer));
+  text_layer_set_font(s_time_hours_layer, s_time_font);
+  text_layer_set_text_alignment(s_time_hours_layer, GTextAlignmentCenter);
+  text_layer_set_text(s_time_hours_layer, "0");
+  layer_add_child(window_layer, text_layer_get_layer(s_time_hours_layer));
 
-  s_dig_time_colon_layer = text_layer_create(
+  s_time_dminutes_layer = text_layer_create(
+    GRect((bounds.size.w / 2) + 5, 124, ((bounds.size.w / 2) - 5) / 2, 40)
+  );
+  text_layer_set_font(s_time_dminutes_layer, s_time_font);
+  text_layer_set_text_alignment(s_time_dminutes_layer, GTextAlignmentCenter);
+  text_layer_set_text(s_time_dminutes_layer, "0");
+  layer_add_child(window_layer, text_layer_get_layer(s_time_dminutes_layer));
+  s_time_minutes_layer = text_layer_create(
+    GRect((bounds.size.w / 2) + 5 + ((bounds.size.w / 2) - 5) / 2, 124, ((bounds.size.w / 2) - 5) / 2, 40)
+  );
+  text_layer_set_font(s_time_minutes_layer, s_time_font);
+  text_layer_set_text_alignment(s_time_minutes_layer, GTextAlignmentCenter);
+  text_layer_set_text(s_time_minutes_layer, "0");
+  layer_add_child(window_layer, text_layer_get_layer(s_time_minutes_layer));
+
+  s_time_colon_layer = text_layer_create(
     GRect((bounds.size.w / 2) - 5, 124, 10, 40)
   );
-  text_layer_set_font(s_dig_time_colon_layer, s_dig_time_font);
-  text_layer_set_text_alignment(s_dig_time_colon_layer, GTextAlignmentCenter);
-  text_layer_set_text(s_dig_time_colon_layer, ":");
-  layer_add_child(window_layer, text_layer_get_layer(s_dig_time_colon_layer));
+  text_layer_set_font(s_time_colon_layer, s_time_font);
+  text_layer_set_text_alignment(s_time_colon_layer, GTextAlignmentCenter);
+  text_layer_set_text(s_time_colon_layer, ":");
+  layer_add_child(window_layer, text_layer_get_layer(s_time_colon_layer));
 
-  s_dig_date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GUNSHIP_26));
-  s_dig_date_layer = text_layer_create(
+  // Date
+  s_date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GUNSHIP_26));
+  s_date_layer = text_layer_create(
     GRect(0, 0, bounds.size.w, 40)
   );
-  text_layer_set_font(s_dig_date_layer, s_dig_date_font);
-  text_layer_set_text_alignment(s_dig_date_layer, GTextAlignmentCenter);
-  text_layer_set_text(s_dig_date_layer, "Unknown");
-  layer_add_child(window_layer, text_layer_get_layer(s_dig_date_layer));
+  text_layer_set_font(s_date_layer, s_date_font);
+  text_layer_set_text_alignment(s_date_layer, GTextAlignmentCenter);
+  text_layer_set_text(s_date_layer, "Unknown");
+  layer_add_child(window_layer, text_layer_get_layer(s_date_layer));
 
   prv_update_display();
 }
@@ -224,12 +267,14 @@ static void prv_window_unload(Window *window) {
   gbitmap_destroy(s_xana_bitmap);
   gbitmap_destroy(s_xana_void_bitmap);
   bitmap_layer_destroy(s_xana_layer);
-  fonts_unload_custom_font(s_dig_time_font);
-  fonts_unload_custom_font(s_dig_date_font);
-  text_layer_destroy(s_dig_time_hours_layer);
-  text_layer_destroy(s_dig_time_colon_layer);
-  text_layer_destroy(s_dig_time_minutes_layer);
-  text_layer_destroy(s_dig_date_layer);
+  fonts_unload_custom_font(s_time_font);
+  fonts_unload_custom_font(s_date_font);
+  text_layer_destroy(s_time_dhours_layer);
+  text_layer_destroy(s_time_hours_layer);
+  text_layer_destroy(s_time_colon_layer);
+  text_layer_destroy(s_time_dminutes_layer);
+  text_layer_destroy(s_time_minutes_layer);
+  text_layer_destroy(s_date_layer);
 }
 
 static void prv_init(void) {
@@ -241,7 +286,11 @@ static void prv_init(void) {
   const bool animated = true;
   window_stack_push(s_window, animated);
 
+  #ifdef DEBUG
+  tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
+  #else
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
+  #endif
 
   connection_service_subscribe((ConnectionHandlers) {
     .pebble_app_connection_handler = bluetooth_callback
