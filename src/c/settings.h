@@ -4,11 +4,20 @@
 
 #define SETTINGS_KEY    1
 
+typedef enum {
+    EYE_MODIFIER_NONE = 0,
+    EYE_MODIFIER_HIDE = 0x01,
+    EYE_MODIFIER_VOID = 0x02,
+    EYE_MODIFIER_GRAY = 0x04,
+} EyeModifiersEnum_t;
+
 typedef struct {
     GColor BackgroundColor;
-    GColor ForegroundColor;
-    bool ShowLogo;
-    bool InvertLogoStateOnDisconnect;
+    GColor TextColor;
+    GColor EyeColor;
+    GColor EyeGrayedColor;
+    EyeModifiersEnum_t EyeOnConnected;
+    EyeModifiersEnum_t EyeOnDisconnected;
     bool VibrateOnDisconnect;
 } ClaySettings;
 

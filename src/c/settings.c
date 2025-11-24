@@ -3,11 +3,13 @@
 void default_settings(ClaySettings *settings) {
     // Colors
     settings->BackgroundColor = GColorWhite;
-    settings->ForegroundColor = GColorBlack;
+    settings->TextColor = GColorBlack;
+    settings->EyeColor = PBL_IF_COLOR_ELSE(GColorDarkCandyAppleRed, GColorBlack);
+    settings->EyeGrayedColor = GColorLightGray;
 
-    // Logo
-    settings->ShowLogo = true;
-    settings->InvertLogoStateOnDisconnect = true;
+    // XANA Eye
+    settings->EyeOnConnected = EYE_MODIFIER_NONE;
+    settings->EyeOnDisconnected = EYE_MODIFIER_VOID;
 
     // Misc
     settings->VibrateOnDisconnect = false;
