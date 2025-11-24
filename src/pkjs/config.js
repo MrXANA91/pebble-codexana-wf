@@ -14,13 +14,36 @@ module.exports = [
         "type": "color",
         "messageKey": "BackgroundColor",
         "defaultValue": "0xFFFFFF",
-        "label": "Background Color"
+        "label": "Background Color",
+        "capabilities": [ "COLOR" ]
       },
       {
         "type": "color",
-        "messageKey": "ForegroundColor",
+        "messageKey": "TextColor",
         "defaultValue": "0x000000",
-        "label": "Foreground Color"
+        "label": "Text Color",
+        "capabilities": [ "COLOR" ]
+      },
+      {
+        "type": "color",
+        "messageKey": "EyeColor",
+        "defaultValue": "0xAA0000",
+        "label": "Eye Color",
+        "capabilities": [ "COLOR" ]
+      },
+      {
+        "type": "color",
+        "messageKey": "EyeGrayedColor",
+        "defaultValue": "0xAAAAAA",
+        "label": "Eye Gray Color",
+        "capabilities": [ "COLOR" ]
+      },
+      {
+        "type": "toggle",
+        "messageKey": "DarkMode",
+        "defaultValue": false,
+        "label": "Dark Mode",
+        "capabilities": [ "BW" ]
       }
     ]
   },
@@ -29,20 +52,19 @@ module.exports = [
     "items": [
       {
         "type": "heading",
-        "defaultValue": "Logo behavior"
+        "defaultValue": "XANA Eye"
       },
       {
         "type": "toggle",
-        "messageKey": "ShowLogo",
-        "label": "Show Logo",
+        "messageKey": "VoidOnDisconnect",
+        "label": "Central circles disappear on lost connection",
         "defaultValue": true
       },
       {
         "type": "toggle",
-        "messageKey": "InvertLogoStateOnDisconnect",
-        "label": "Invert Logo state when phone connection is lost",
-        "defaultValue": true,
-        "description": "This will invert the default state of the logo when losing phone connection. For example, if 'Show Logo' is disable and this is enabled, logo will appear when connection is lost. By default, logo will disappear when connection is lost."
+        "messageKey": "GrayOnDisconnect",
+        "label": "Gray out on lost connection",
+        "defaultValue": false
       }
     ]
   },
@@ -51,14 +73,14 @@ module.exports = [
     "items": [
       {
         "type": "heading",
-        "defaultValue": "More options"
+        "defaultValue": "Vibes"
       },
       {
         "type": "toggle",
         "messageKey": "VibrateOnDisconnect",
         "label": "Vibrate on disconnect",
         "defaultValue": false
-      },
+      }
     ]
   },
   {

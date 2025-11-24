@@ -28,9 +28,12 @@
     },
     "messageKeys": [
       "BackgroundColor",
-      "ForegroundColor",
-      "ShowLogo",
-      "InvertLogoStateOnDisconnect",
+      "TextColor",
+      "EyeColor",
+      "EyeGrayedColor",
+      "DarkMode",
+      "VoidOnDisconnect",
+      "GrayOnDisconnect",
       "VibrateOnDisconnect"
     ],
     "capabilities": [

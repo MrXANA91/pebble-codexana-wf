@@ -3,6 +3,10 @@
 #include <pebble.h>
 
 // #define DEBUG
+// #define SIMULATE_DISCONNECTED
+
+#define TIME_TEXT_HEIGHT  40
+#define DATE_TEXT_HEIGHT  40
 
 static Window *s_window;
 
@@ -33,20 +37,45 @@ static void prv_inbox_received_handler(DictionaryIterator *iter, void *context) 
     settings.BackgroundColor = GColorFromHEX(bg_color_t->value->int32);
   }
 
-  Tuple *fg_color_t = dict_find(iter, MESSAGE_KEY_ForegroundColor);
-  if(fg_color_t) {
-    settings.ForegroundColor = GColorFromHEX(fg_color_t->value->int32);
+  Tuple *txt_color_t = dict_find(iter, MESSAGE_KEY_TextColor);
+  if(txt_color_t) {
+    settings.TextColor = GColorFromHEX(txt_color_t->value->int32);
   }
 
-  // Logo
-  Tuple *show_logo_t = dict_find(iter, MESSAGE_KEY_ShowLogo);
-  if(show_logo_t) {
-    settings.ShowLogo = show_logo_t->value->int32 == 1;
+  Tuple *eye_color_t = dict_find(iter, MESSAGE_KEY_EyeColor);
+  if(eye_color_t) {
+    settings.EyeColor = GColorFromHEX(eye_color_t->value->int32);
   }
 
-  Tuple *hide_logo_on_disc = dict_find(iter, MESSAGE_KEY_InvertLogoStateOnDisconnect);
-  if(hide_logo_on_disc) {
-    settings.InvertLogoStateOnDisconnect = hide_logo_on_disc->value->int32 == 1;
+  Tuple *eyeg_color_t = dict_find(iter, MESSAGE_KEY_EyeGrayedColor);
+  if(eyeg_color_t) {
+    settings.EyeGrayedColor = GColorFromHEX(eyeg_color_t->value->int32);
+  }
+
+  Tuple *dm_color_t = dict_find(iter, MESSAGE_KEY_DarkMode);
+  if(dm_color_t) {
+    bool darkMode = dm_color_t->value->int32 == 1;
+    settings.BackgroundColor = darkMode ? GColorBlack : GColorWhite;
+    settings.TextColor = darkMode ? GColorWhite : GColorBlack;
+    settings.EyeColor = darkMode ? GColorWhite : GColorBlack;
+    settings.EyeGrayedColor = darkMode ? GColorDarkGray : GColorLightGray;
+  }
+
+  // XANA Eye
+  Tuple *void_on_disconnect_t = dict_find(iter, MESSAGE_KEY_VoidOnDisconnect);
+  if(void_on_disconnect_t) {
+    settings.EyeOnDisconnected &= ~(EYE_MODIFIER_VOID);
+    if (void_on_disconnect_t->value->int32 == 1) {
+      settings.EyeOnDisconnected |= EYE_MODIFIER_VOID;
+    }
+  }
+
+  Tuple *gray_on_disconnect_t = dict_find(iter, MESSAGE_KEY_GrayOnDisconnect);
+  if(gray_on_disconnect_t) {
+    settings.EyeOnDisconnected &= ~(EYE_MODIFIER_GRAY);
+    if (gray_on_disconnect_t->value->int32 == 1) {
+      settings.EyeOnDisconnected |= EYE_MODIFIER_GRAY;
+    }
   }
 
   // Misc
@@ -104,17 +133,37 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   update_time();
 }
 
-static void bluetooth_callback(bool connected) {
-  if (settings.InvertLogoStateOnDisconnect) {
-    bool hide = connected ? !settings.ShowLogo : settings.ShowLogo;
-
-    // layer_set_hidden(bitmap_layer_get_layer(s_xana_layer), hide);
-    if (hide) {
-      bitmap_layer_set_bitmap(s_xana_layer, s_xana_void_bitmap);
-    } else {
-      bitmap_layer_set_bitmap(s_xana_layer, s_xana_bitmap);
-    }
+static void prv_update_xana_eye(EyeModifiersEnum_t modifiers) {
+  if (modifiers == EYE_MODIFIER_NONE) {
+    bitmap_layer_set_bitmap(s_xana_layer, s_xana_bitmap);
+    *s_xana_color = settings.EyeColor;
+    layer_set_hidden(bitmap_layer_get_layer(s_xana_layer), false);
+    return;
   }
+
+  if ((modifiers & EYE_MODIFIER_HIDE) != 0) {
+    layer_set_hidden(bitmap_layer_get_layer(s_xana_layer), true);
+  } else {
+    layer_set_hidden(bitmap_layer_get_layer(s_xana_layer), false);
+  }
+
+  if ((modifiers & EYE_MODIFIER_VOID) != 0) {
+    bitmap_layer_set_bitmap(s_xana_layer, s_xana_void_bitmap);
+  } else {
+    bitmap_layer_set_bitmap(s_xana_layer, s_xana_bitmap);
+  }
+
+  if ((modifiers & EYE_MODIFIER_GRAY) != 0) {
+    if (s_xana_color) *s_xana_color = settings.EyeGrayedColor;
+    if (s_xana_void_color) *s_xana_void_color = settings.EyeGrayedColor;
+  } else {
+    if (s_xana_color) *s_xana_color = settings.EyeColor;
+    if (s_xana_void_color) *s_xana_void_color = settings.EyeColor;
+  }
+}
+
+static void bluetooth_callback(bool connected) {
+  prv_update_xana_eye(connected ? settings.EyeOnConnected : settings.EyeOnDisconnected);
 
   if (settings.VibrateOnDisconnect && !connected) {
     vibes_double_pulse();
@@ -173,27 +222,21 @@ static void prv_get_black_palette(GColor **palette_ptr_ptr, GBitmap* bitmap) {
 static void prv_update_display() {
   window_set_background_color(s_window, settings.BackgroundColor);
   bitmap_layer_set_background_color(s_xana_layer, settings.BackgroundColor);
-  if (s_xana_color) {
-    *s_xana_color = settings.ForegroundColor;
-  }
-  if (s_xana_void_color) {
-    *s_xana_void_color = settings.ForegroundColor;
-  }
-  layer_set_hidden(bitmap_layer_get_layer(s_xana_layer), !settings.ShowLogo);
+  prv_update_xana_eye(settings.EyeOnConnected);
 
   text_layer_set_background_color(s_time_hours_layer, settings.BackgroundColor);
-  text_layer_set_text_color(s_time_hours_layer, settings.ForegroundColor);
+  text_layer_set_text_color(s_time_hours_layer, settings.TextColor);
   text_layer_set_background_color(s_time_dhours_layer, settings.BackgroundColor);
-  text_layer_set_text_color(s_time_dhours_layer, settings.ForegroundColor);
+  text_layer_set_text_color(s_time_dhours_layer, settings.TextColor);
   text_layer_set_background_color(s_time_colon_layer, settings.BackgroundColor);
-  text_layer_set_text_color(s_time_colon_layer, settings.ForegroundColor);
+  text_layer_set_text_color(s_time_colon_layer, settings.TextColor);
   text_layer_set_background_color(s_time_minutes_layer, settings.BackgroundColor);
-  text_layer_set_text_color(s_time_minutes_layer, settings.ForegroundColor);
+  text_layer_set_text_color(s_time_minutes_layer, settings.TextColor);
   text_layer_set_background_color(s_time_dminutes_layer, settings.BackgroundColor);
-  text_layer_set_text_color(s_time_dminutes_layer, settings.ForegroundColor);
+  text_layer_set_text_color(s_time_dminutes_layer, settings.TextColor);
 
   text_layer_set_background_color(s_date_layer, settings.BackgroundColor);
-  text_layer_set_text_color(s_date_layer, settings.ForegroundColor);
+  text_layer_set_text_color(s_date_layer, settings.TextColor);
 }
 
 static void prv_window_load(Window *window) {
@@ -205,7 +248,9 @@ static void prv_window_load(Window *window) {
   s_xana_void_bitmap = gbitmap_create_with_resource(RESOURCE_ID_XANA_VOID);
   prv_get_black_palette(&s_xana_color, s_xana_bitmap);
   prv_get_black_palette(&s_xana_void_color, s_xana_void_bitmap);
-  s_xana_layer = bitmap_layer_create(bounds);
+  s_xana_layer = bitmap_layer_create(
+    GRect(bounds.origin.x + 1, bounds.origin.y, bounds.size.w - 1, bounds.size.h)
+  );
   bitmap_layer_set_bitmap(s_xana_layer, s_xana_bitmap);
   bitmap_layer_set_compositing_mode(s_xana_layer, GCompOpSet);
   layer_add_child(window_layer, bitmap_layer_get_layer(s_xana_layer));
@@ -213,14 +258,14 @@ static void prv_window_load(Window *window) {
   // Time
   s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GUNSHIP_33));
   s_time_dhours_layer = text_layer_create(
-    GRect(0, 124, ((bounds.size.w / 2) - 5) / 2, 40)
+    GRect(0, bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
   );
   text_layer_set_font(s_time_dhours_layer, s_time_font);
   text_layer_set_text_alignment(s_time_dhours_layer, GTextAlignmentCenter);
   text_layer_set_text(s_time_dhours_layer, "0");
   layer_add_child(window_layer, text_layer_get_layer(s_time_dhours_layer));
   s_time_hours_layer = text_layer_create(
-    GRect(((bounds.size.w / 2) - 5) / 2, 124, ((bounds.size.w / 2) - 5) / 2, 40)
+    GRect(((bounds.size.w / 2) - 5) / 2, bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
   );
   text_layer_set_font(s_time_hours_layer, s_time_font);
   text_layer_set_text_alignment(s_time_hours_layer, GTextAlignmentCenter);
@@ -228,14 +273,14 @@ static void prv_window_load(Window *window) {
   layer_add_child(window_layer, text_layer_get_layer(s_time_hours_layer));
 
   s_time_dminutes_layer = text_layer_create(
-    GRect((bounds.size.w / 2) + 5, 124, ((bounds.size.w / 2) - 5) / 2, 40)
+    GRect((bounds.size.w / 2) + 5, bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
   );
   text_layer_set_font(s_time_dminutes_layer, s_time_font);
   text_layer_set_text_alignment(s_time_dminutes_layer, GTextAlignmentCenter);
   text_layer_set_text(s_time_dminutes_layer, "0");
   layer_add_child(window_layer, text_layer_get_layer(s_time_dminutes_layer));
   s_time_minutes_layer = text_layer_create(
-    GRect((bounds.size.w / 2) + 5 + ((bounds.size.w / 2) - 5) / 2, 124, ((bounds.size.w / 2) - 5) / 2, 40)
+    GRect((bounds.size.w / 2) + 5 + ((bounds.size.w / 2) - 5) / 2, bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
   );
   text_layer_set_font(s_time_minutes_layer, s_time_font);
   text_layer_set_text_alignment(s_time_minutes_layer, GTextAlignmentCenter);
@@ -243,7 +288,7 @@ static void prv_window_load(Window *window) {
   layer_add_child(window_layer, text_layer_get_layer(s_time_minutes_layer));
 
   s_time_colon_layer = text_layer_create(
-    GRect((bounds.size.w / 2) - 5, 124, 10, 40)
+    GRect((bounds.size.w / 2) - 5, bounds.size.h - TIME_TEXT_HEIGHT, 10, TIME_TEXT_HEIGHT)
   );
   text_layer_set_font(s_time_colon_layer, s_time_font);
   text_layer_set_text_alignment(s_time_colon_layer, GTextAlignmentCenter);
@@ -253,7 +298,7 @@ static void prv_window_load(Window *window) {
   // Date
   s_date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GUNSHIP_26));
   s_date_layer = text_layer_create(
-    GRect(0, 0, bounds.size.w, 40)
+    GRect(0, 0, bounds.size.w, DATE_TEXT_HEIGHT)
   );
   text_layer_set_font(s_date_layer, s_date_font);
   text_layer_set_text_alignment(s_date_layer, GTextAlignmentCenter);
@@ -286,11 +331,13 @@ static void prv_init(void) {
   const bool animated = true;
   window_stack_push(s_window, animated);
 
+  tick_timer_service_subscribe(
   #ifdef DEBUG
-  tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
+  SECOND_UNIT
   #else
-  tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
+  MINUTE_UNIT
   #endif
+  , tick_handler);
 
   connection_service_subscribe((ConnectionHandlers) {
     .pebble_app_connection_handler = bluetooth_callback
@@ -298,7 +345,13 @@ static void prv_init(void) {
 
   update_time();
 
-  bluetooth_callback(connection_service_peek_pebble_app_connection());
+  bluetooth_callback(
+    #ifdef SIMULATE_DISCONNECTED
+    false
+    #else
+    connection_service_peek_pebble_app_connection()
+    #endif
+    );
 }
 
 static void prv_deinit(void) {
