@@ -4,17 +4,17 @@
 
 // #define DEBUG
 
-#define TIME_TEXT_HEIGHT  40
+#define TIME_TEXT_HEIGHT  PBL_IF_ROUND_ELSE(40, 45)
 #define DATE_TEXT_HEIGHT  40
 
-#define GRect_Date(bounds) GRect(0, 0, bounds.size.w, DATE_TEXT_HEIGHT)
+#define GRect_Date(bounds) GRect(bounds.origin.x, bounds.origin.y, bounds.size.w, DATE_TEXT_HEIGHT)
 #define GRect_XANA_default(bounds) GRect(bounds.origin.x + 1, bounds.origin.y, bounds.size.w - 1, bounds.size.h)
 #define GRect_XANA_obstructed(bounds) GRect(bounds.origin.x + 1, bounds.origin.y, bounds.size.w - 1, gbitmap_get_bounds(s_xana_bitmap).size.h)
-#define GRect_DHours(bounds) GRect(0, bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
-#define GRect_Hours(bounds) GRect(((bounds.size.w / 2) - 5) / 2, bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
-#define GRect_Colon(bounds) GRect((bounds.size.w / 2) - 5, bounds.size.h - TIME_TEXT_HEIGHT, 10, TIME_TEXT_HEIGHT)
-#define GRect_DMinutes(bounds) GRect((bounds.size.w / 2) + 5, bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
-#define GRect_Minutes(bounds) GRect((bounds.size.w / 2) + 5 + ((bounds.size.w / 2) - 5) / 2, bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
+#define GRect_DHours(bounds) GRect(bounds.origin.x, bounds.origin.y + bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
+#define GRect_Hours(bounds) GRect(bounds.origin.x + ((bounds.size.w / 2) - 5) / 2, bounds.origin.y + bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
+#define GRect_Colon(bounds) GRect(bounds.origin.x + (bounds.size.w / 2) - 5, bounds.origin.y + bounds.size.h - TIME_TEXT_HEIGHT, 10, TIME_TEXT_HEIGHT)
+#define GRect_DMinutes(bounds) GRect(bounds.origin.x + (bounds.size.w / 2) + 5, bounds.origin.y + bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
+#define GRect_Minutes(bounds) GRect(bounds.origin.x + (bounds.size.w / 2) + 5 + ((bounds.size.w / 2) - 5) / 2, bounds.origin.y + bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
 
 static Window *s_window;
 
@@ -133,7 +133,13 @@ static void update_time() {
   text_layer_set_text(s_time_dminutes_layer, s_dminutes_buffer);
   text_layer_set_text(s_time_minutes_layer, s_minutes_buffer);
 
-  strftime(s_date_buffer, sizeof(s_date_buffer), "%a %d", current_time);
+  strftime(s_date_buffer, sizeof(s_date_buffer), 
+    #ifdef DEBUG
+    "WED 30"
+    #else
+    "%a %d"
+    #endif
+    , current_time);
   text_layer_set_text(s_date_layer, s_date_buffer);
 }
 
@@ -260,6 +266,13 @@ static void prv_window_load(Window *window) {
   bitmap_layer_set_bitmap(s_xana_layer, s_xana_bitmap);
   bitmap_layer_set_compositing_mode(s_xana_layer, GCompOpSet);
   layer_add_child(window_layer, bitmap_layer_get_layer(s_xana_layer));
+
+  #ifdef PBL_ROUND
+  bounds.origin.x += 20;
+  bounds.origin.y += 20;
+  bounds.size.w -= 40;
+  bounds.size.h -= 45;
+  #endif
 
   // Time
   s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GUNSHIP_33));
