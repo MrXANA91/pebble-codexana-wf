@@ -3,10 +3,18 @@
 #include <pebble.h>
 
 // #define DEBUG
-// #define SIMULATE_DISCONNECTED
 
 #define TIME_TEXT_HEIGHT  40
 #define DATE_TEXT_HEIGHT  40
+
+#define GRect_Date(bounds) GRect(0, 0, bounds.size.w, DATE_TEXT_HEIGHT)
+#define GRect_XANA_default(bounds) GRect(bounds.origin.x + 1, bounds.origin.y, bounds.size.w - 1, bounds.size.h)
+#define GRect_XANA_obstructed(bounds) GRect(bounds.origin.x + 1, bounds.origin.y, bounds.size.w - 1, gbitmap_get_bounds(s_xana_bitmap).size.h)
+#define GRect_DHours(bounds) GRect(0, bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
+#define GRect_Hours(bounds) GRect(((bounds.size.w / 2) - 5) / 2, bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
+#define GRect_Colon(bounds) GRect((bounds.size.w / 2) - 5, bounds.size.h - TIME_TEXT_HEIGHT, 10, TIME_TEXT_HEIGHT)
+#define GRect_DMinutes(bounds) GRect((bounds.size.w / 2) + 5, bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
+#define GRect_Minutes(bounds) GRect((bounds.size.w / 2) + 5 + ((bounds.size.w / 2) - 5) / 2, bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
 
 static Window *s_window;
 
@@ -224,18 +232,18 @@ static void prv_update_display() {
   bitmap_layer_set_background_color(s_xana_layer, settings.BackgroundColor);
   prv_update_xana_eye(settings.EyeOnConnected);
 
-  text_layer_set_background_color(s_time_hours_layer, settings.BackgroundColor);
+  text_layer_set_background_color(s_time_hours_layer, GColorClear);
   text_layer_set_text_color(s_time_hours_layer, settings.TextColor);
-  text_layer_set_background_color(s_time_dhours_layer, settings.BackgroundColor);
+  text_layer_set_background_color(s_time_dhours_layer, GColorClear);
   text_layer_set_text_color(s_time_dhours_layer, settings.TextColor);
-  text_layer_set_background_color(s_time_colon_layer, settings.BackgroundColor);
+  text_layer_set_background_color(s_time_colon_layer, GColorClear);
   text_layer_set_text_color(s_time_colon_layer, settings.TextColor);
-  text_layer_set_background_color(s_time_minutes_layer, settings.BackgroundColor);
+  text_layer_set_background_color(s_time_minutes_layer, GColorClear);
   text_layer_set_text_color(s_time_minutes_layer, settings.TextColor);
-  text_layer_set_background_color(s_time_dminutes_layer, settings.BackgroundColor);
+  text_layer_set_background_color(s_time_dminutes_layer, GColorClear);
   text_layer_set_text_color(s_time_dminutes_layer, settings.TextColor);
 
-  text_layer_set_background_color(s_date_layer, settings.BackgroundColor);
+  text_layer_set_background_color(s_date_layer, GColorClear);
   text_layer_set_text_color(s_date_layer, settings.TextColor);
 }
 
@@ -248,48 +256,36 @@ static void prv_window_load(Window *window) {
   s_xana_void_bitmap = gbitmap_create_with_resource(RESOURCE_ID_XANA_VOID);
   prv_get_black_palette(&s_xana_color, s_xana_bitmap);
   prv_get_black_palette(&s_xana_void_color, s_xana_void_bitmap);
-  s_xana_layer = bitmap_layer_create(
-    GRect(bounds.origin.x + 1, bounds.origin.y, bounds.size.w - 1, bounds.size.h)
-  );
+  s_xana_layer = bitmap_layer_create(GRect_XANA_default(bounds));
   bitmap_layer_set_bitmap(s_xana_layer, s_xana_bitmap);
   bitmap_layer_set_compositing_mode(s_xana_layer, GCompOpSet);
   layer_add_child(window_layer, bitmap_layer_get_layer(s_xana_layer));
 
   // Time
   s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GUNSHIP_33));
-  s_time_dhours_layer = text_layer_create(
-    GRect(0, bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
-  );
+  s_time_dhours_layer = text_layer_create(GRect_DHours(bounds));
   text_layer_set_font(s_time_dhours_layer, s_time_font);
   text_layer_set_text_alignment(s_time_dhours_layer, GTextAlignmentCenter);
   text_layer_set_text(s_time_dhours_layer, "0");
   layer_add_child(window_layer, text_layer_get_layer(s_time_dhours_layer));
-  s_time_hours_layer = text_layer_create(
-    GRect(((bounds.size.w / 2) - 5) / 2, bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
-  );
+  s_time_hours_layer = text_layer_create(GRect_Hours(bounds));
   text_layer_set_font(s_time_hours_layer, s_time_font);
   text_layer_set_text_alignment(s_time_hours_layer, GTextAlignmentCenter);
   text_layer_set_text(s_time_hours_layer, "0");
   layer_add_child(window_layer, text_layer_get_layer(s_time_hours_layer));
 
-  s_time_dminutes_layer = text_layer_create(
-    GRect((bounds.size.w / 2) + 5, bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
-  );
+  s_time_dminutes_layer = text_layer_create(GRect_DMinutes(bounds));
   text_layer_set_font(s_time_dminutes_layer, s_time_font);
   text_layer_set_text_alignment(s_time_dminutes_layer, GTextAlignmentCenter);
   text_layer_set_text(s_time_dminutes_layer, "0");
   layer_add_child(window_layer, text_layer_get_layer(s_time_dminutes_layer));
-  s_time_minutes_layer = text_layer_create(
-    GRect((bounds.size.w / 2) + 5 + ((bounds.size.w / 2) - 5) / 2, bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
-  );
+  s_time_minutes_layer = text_layer_create(GRect_Minutes(bounds));
   text_layer_set_font(s_time_minutes_layer, s_time_font);
   text_layer_set_text_alignment(s_time_minutes_layer, GTextAlignmentCenter);
   text_layer_set_text(s_time_minutes_layer, "0");
   layer_add_child(window_layer, text_layer_get_layer(s_time_minutes_layer));
 
-  s_time_colon_layer = text_layer_create(
-    GRect((bounds.size.w / 2) - 5, bounds.size.h - TIME_TEXT_HEIGHT, 10, TIME_TEXT_HEIGHT)
-  );
+  s_time_colon_layer = text_layer_create(GRect_Colon(bounds));
   text_layer_set_font(s_time_colon_layer, s_time_font);
   text_layer_set_text_alignment(s_time_colon_layer, GTextAlignmentCenter);
   text_layer_set_text(s_time_colon_layer, ":");
@@ -297,9 +293,7 @@ static void prv_window_load(Window *window) {
 
   // Date
   s_date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GUNSHIP_26));
-  s_date_layer = text_layer_create(
-    GRect(0, 0, bounds.size.w, DATE_TEXT_HEIGHT)
-  );
+  s_date_layer = text_layer_create(GRect_Date(bounds));
   text_layer_set_font(s_date_layer, s_date_font);
   text_layer_set_text_alignment(s_date_layer, GTextAlignmentCenter);
   text_layer_set_text(s_date_layer, "Unknown");
@@ -320,6 +314,40 @@ static void prv_window_unload(Window *window) {
   text_layer_destroy(s_time_dminutes_layer);
   text_layer_destroy(s_time_minutes_layer);
   text_layer_destroy(s_date_layer);
+}
+
+static void prv_unobstructed_will_change(GRect final_unobstructed_screen_area, void *context) {
+  GRect full_bounds = layer_get_bounds(window_get_root_layer(s_window));
+  if (!grect_equal(&full_bounds, &final_unobstructed_screen_area)) {
+    // Screen is about to become obstructed, hide the date
+    layer_set_hidden(text_layer_get_layer(s_date_layer), true);
+    // Move the eye
+    layer_set_frame(bitmap_layer_get_layer(s_xana_layer), GRect_XANA_obstructed(final_unobstructed_screen_area));
+    // Move the time
+    layer_set_frame(text_layer_get_layer(s_time_dhours_layer), GRect_DHours(final_unobstructed_screen_area));
+    layer_set_frame(text_layer_get_layer(s_time_hours_layer), GRect_Hours(final_unobstructed_screen_area));
+    layer_set_frame(text_layer_get_layer(s_time_colon_layer), GRect_Colon(final_unobstructed_screen_area));
+    layer_set_frame(text_layer_get_layer(s_time_dminutes_layer), GRect_DMinutes(final_unobstructed_screen_area));
+    layer_set_frame(text_layer_get_layer(s_time_minutes_layer), GRect_Minutes(final_unobstructed_screen_area));
+  }
+}
+
+static void prv_unobstructed_did_change(void *context) {
+  Layer *window_layer = window_get_root_layer(s_window);
+  GRect full_bounds = layer_get_bounds(window_layer);
+  GRect bounds = layer_get_unobstructed_bounds(window_layer);
+  if (grect_equal(&full_bounds, &bounds)) {
+    // Screen is no longer obstructed, show the date
+    layer_set_hidden(text_layer_get_layer(s_date_layer), false);
+    // Move the eye
+    layer_set_frame(bitmap_layer_get_layer(s_xana_layer), GRect_XANA_default(bounds));
+    // Move the time
+    layer_set_frame(text_layer_get_layer(s_time_dhours_layer), GRect_DHours(bounds));
+    layer_set_frame(text_layer_get_layer(s_time_hours_layer), GRect_Hours(bounds));
+    layer_set_frame(text_layer_get_layer(s_time_colon_layer), GRect_Colon(bounds));
+    layer_set_frame(text_layer_get_layer(s_time_dminutes_layer), GRect_DMinutes(bounds));
+    layer_set_frame(text_layer_get_layer(s_time_minutes_layer), GRect_Minutes(bounds));
+  }
 }
 
 static void prv_init(void) {
@@ -343,15 +371,15 @@ static void prv_init(void) {
     .pebble_app_connection_handler = bluetooth_callback
   });
 
+  UnobstructedAreaHandlers handlers = {
+    .will_change = prv_unobstructed_will_change,
+    .did_change = prv_unobstructed_did_change
+  };
+  unobstructed_area_service_subscribe(handlers, NULL);
+
   update_time();
 
-  bluetooth_callback(
-    #ifdef SIMULATE_DISCONNECTED
-    false
-    #else
-    connection_service_peek_pebble_app_connection()
-    #endif
-    );
+  bluetooth_callback(connection_service_peek_pebble_app_connection());
 }
 
 static void prv_deinit(void) {
