@@ -14,7 +14,7 @@ static void default_settings() {
     s_settings.BatteryLevelColor = PBL_IF_COLOR_ELSE(GColorBulgarianRose, GColorDarkGray);
 
     // XANA Eye
-    s_settings.EyeOnConnected = EYE_MODIFIER_NONE;
+    s_settings.EyeOnConnected = EYE_MODIFIER_GRAY;
     s_settings.EyeOnDisconnected = EYE_MODIFIER_VOID;
 
     // Battery

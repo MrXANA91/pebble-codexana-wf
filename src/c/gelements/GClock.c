@@ -8,26 +8,26 @@ static TextLayer *s_time_dminutes_layer;
 static TextLayer *s_time_minutes_layer;
 
 void clock_init(Layer* window_layer, GRect bounds) {
-  s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GUNSHIP_33));
+  s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GUNSHIP_48));
   s_time_dhours_layer = text_layer_create(GRect_DHours(bounds));
   text_layer_set_font(s_time_dhours_layer, s_time_font);
-  text_layer_set_text_alignment(s_time_dhours_layer, GTextAlignmentCenter);
+  text_layer_set_text_alignment(s_time_dhours_layer, GTextAlignmentRight);
   text_layer_set_text(s_time_dhours_layer, "0");
   layer_add_child(window_layer, text_layer_get_layer(s_time_dhours_layer));
   s_time_hours_layer = text_layer_create(GRect_Hours(bounds));
   text_layer_set_font(s_time_hours_layer, s_time_font);
-  text_layer_set_text_alignment(s_time_hours_layer, GTextAlignmentCenter);
+  text_layer_set_text_alignment(s_time_hours_layer, GTextAlignmentLeft);
   text_layer_set_text(s_time_hours_layer, "0");
   layer_add_child(window_layer, text_layer_get_layer(s_time_hours_layer));
 
   s_time_dminutes_layer = text_layer_create(GRect_DMinutes(bounds));
   text_layer_set_font(s_time_dminutes_layer, s_time_font);
-  text_layer_set_text_alignment(s_time_dminutes_layer, GTextAlignmentCenter);
+  text_layer_set_text_alignment(s_time_dminutes_layer, GTextAlignmentRight);
   text_layer_set_text(s_time_dminutes_layer, "0");
   layer_add_child(window_layer, text_layer_get_layer(s_time_dminutes_layer));
   s_time_minutes_layer = text_layer_create(GRect_Minutes(bounds));
   text_layer_set_font(s_time_minutes_layer, s_time_font);
-  text_layer_set_text_alignment(s_time_minutes_layer, GTextAlignmentCenter);
+  text_layer_set_text_alignment(s_time_minutes_layer, GTextAlignmentLeft);
   text_layer_set_text(s_time_minutes_layer, "0");
   layer_add_child(window_layer, text_layer_get_layer(s_time_minutes_layer));
 
@@ -35,7 +35,7 @@ void clock_init(Layer* window_layer, GRect bounds) {
   text_layer_set_font(s_time_colon_layer, s_time_font);
   text_layer_set_text_alignment(s_time_colon_layer, GTextAlignmentCenter);
   text_layer_set_text(s_time_colon_layer, ":");
-  layer_add_child(window_layer, text_layer_get_layer(s_time_colon_layer));
+  // layer_add_child(window_layer, text_layer_get_layer(s_time_colon_layer));
 }
 
 void clock_update(struct tm * current_time) {

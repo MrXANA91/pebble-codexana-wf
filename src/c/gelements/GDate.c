@@ -9,7 +9,7 @@ void date_init(Layer* window_layer, GRect bounds) {
   text_layer_set_font(s_date_layer, s_date_font);
   text_layer_set_text_alignment(s_date_layer, GTextAlignmentCenter);
   text_layer_set_text(s_date_layer, "Unknown");
-  layer_add_child(window_layer, text_layer_get_layer(s_date_layer));
+  // layer_add_child(window_layer, text_layer_get_layer(s_date_layer));
 }
 
 void date_update(struct tm * current_time) {

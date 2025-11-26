@@ -55,6 +55,12 @@
         },
         {
           "type": "font",
+          "name": "FONT_GUNSHIP_48",
+          "file": "fonts/gunship.ttf",
+          "compatibilty": "2.7"
+        },
+        {
+          "type": "font",
           "name": "FONT_GUNSHIP_33",
           "file": "fonts/gunship.ttf",
           "compatibilty": "2.7"
@@ -80,6 +86,11 @@
           "type": "bitmap",
           "name": "XANA_VOID",
           "file": "images/xana_void_57x91.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "XANA_FULL",
+          "file": "images/xana_144x168.png"
         }
       ]
     }

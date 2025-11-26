@@ -56,7 +56,7 @@ static void prv_get_black_palette(GColor **palette_ptr_ptr, GBitmap* bitmap) {
 }
 
 void eye_init(Layer* window_layer, GRect bounds) {
-  s_xana_bitmap = gbitmap_create_with_resource(RESOURCE_ID_XANA);
+  s_xana_bitmap = gbitmap_create_with_resource(RESOURCE_ID_XANA_FULL);
   s_xana_void_bitmap = gbitmap_create_with_resource(RESOURCE_ID_XANA_VOID);
   prv_get_black_palette(&s_xana_color, s_xana_bitmap);
   prv_get_black_palette(&s_xana_void_color, s_xana_void_bitmap);
