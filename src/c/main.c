@@ -69,6 +69,10 @@ static void health_callback(HealthEventType event, void *context) {
   }
 }
 
+static void accel_tap_handler(AccelAxisType axis, int32_t direction) {
+  eye_start_animation();
+}
+
 static void prv_init(void) {
   main_window_push();
 
@@ -95,6 +99,7 @@ static void prv_init(void) {
   #endif
 
   // First time init values
+  accel_tap_service_subscribe(accel_tap_handler);
 
   update_time();
 
