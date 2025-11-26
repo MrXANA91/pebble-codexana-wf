@@ -38,6 +38,10 @@ static void battery_callback(BatteryChargeState batteryCharge) {
   battery_lvl_update(batteryCharge.charge_percent);
 }
 
+static void accel_tap_handler(AccelAxisType axis, int32_t direction) {
+  eye_start_animation();
+}
+
 static void prv_init(void) {
   main_window_push();
 
@@ -54,6 +58,8 @@ static void prv_init(void) {
   });
   
   battery_state_service_subscribe(battery_callback);
+
+  accel_tap_service_subscribe(accel_tap_handler);
 
   update_time();
 
