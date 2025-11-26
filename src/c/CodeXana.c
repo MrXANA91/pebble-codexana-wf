@@ -37,6 +37,7 @@ static TextLayer *s_date_layer;
 static ClaySettings settings;
 
 static void prv_update_display();
+static void prv_unobstructed_will_change(GRect final_unobstructed_screen_area, void *context);
 
 static void prv_inbox_received_handler(DictionaryIterator *iter, void *context) {
   // Colors
@@ -313,6 +314,8 @@ static void prv_window_load(Window *window) {
   layer_add_child(window_layer, text_layer_get_layer(s_date_layer));
 
   prv_update_display();
+
+  prv_unobstructed_will_change(bounds, NULL);
 }
 
 static void prv_window_unload(Window *window) {
