@@ -32,9 +32,13 @@
       "TextColor",
       "EyeColor",
       "EyeGrayedColor",
+      "BatteryLevelColor",
       "DarkMode",
+      "GrayBatteryBar",
       "VoidOnDisconnect",
       "GrayOnDisconnect",
+      "DisplayBatteryPercentage",
+      "DisplayBatteryBar",
       "VibrateOnDisconnect"
     ],
     "capabilities": [
@@ -58,6 +62,12 @@
         {
           "type": "font",
           "name": "FONT_GUNSHIP_26",
+          "file": "fonts/gunship.ttf",
+          "compatibilty": "2.7"
+        },
+        {
+          "type": "font",
+          "name": "FONT_GUNSHIP_15",
           "file": "fonts/gunship.ttf",
           "compatibilty": "2.7"
         },

@@ -39,11 +39,26 @@ module.exports = [
         "capabilities": [ "COLOR" ]
       },
       {
+        "type": "color",
+        "messageKey": "BatteryLevelColor",
+        "defaultValue": "0x550000",
+        "label": "Battery Level Color",
+        "capabilities": [ "COLOR" ]
+      },
+      {
         "type": "toggle",
         "messageKey": "DarkMode",
         "defaultValue": false,
         "label": "Dark Mode",
         "capabilities": [ "BW" ]
+      },
+      {
+        "type": "toggle",
+        "messageKey": "GrayBatteryBar",
+        "defaultValue": true,
+        "label": "Gray Battery Bar Level",
+        "capabilities": [ "BW" ],
+        "description": "Enable this to set the battery bar color to gray. If disabled, color will be same as text"
       }
     ]
   },
@@ -65,6 +80,27 @@ module.exports = [
         "messageKey": "GrayOnDisconnect",
         "label": "Gray out on lost connection",
         "defaultValue": false
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Battery"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "DisplayBatteryPercentage",
+        "label": "Display Battery Percentage",
+        "defaultValue": true
+      },
+      {
+        "type": "toggle",
+        "messageKey": "DisplayBatteryBar",
+        "label": "Display Battery Bar",
+        "defaultValue": true
       }
     ]
   },
