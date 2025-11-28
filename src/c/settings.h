@@ -16,8 +16,11 @@ typedef struct {
     GColor TextColor;
     GColor EyeColor;
     GColor EyeGrayedColor;
+    GColor BatteryLevelColor;
     EyeModifiersEnum_t EyeOnConnected;
     EyeModifiersEnum_t EyeOnDisconnected;
+    bool DisplayBatteryPercentage;
+    bool DisplayBatteryBar;
     bool VibrateOnDisconnect;
 } ClaySettings;
 
