@@ -2,7 +2,7 @@
 Code XANA watchface for Pebble watches
 
 ![white_bg](screenshots/aplite-1.png)
-![black_bg_color](screenshots/basalt-2.png)
+![white_bg_color](screenshots/basalt-1.png)
 
 > Other screenshots available in the `screenshots` folder
 
