@@ -22,8 +22,16 @@ typedef struct {
     bool DisplayBatteryPercentage;
     bool DisplayBatteryBar;
     bool VibrateOnDisconnect;
+
 } ClaySettings;
 
-void default_settings(ClaySettings *settings);
-void save_settings(ClaySettings *settings);
-void load_settings(ClaySettings *settings);
+typedef void (*NewSettingsHandler)(ClaySettings *);
+
+/// @brief Initialize settings
+void settings_init();
+/// @brief Gets a pointer to the settings
+/// @return Pointer to the ClaySettings struct
+ClaySettings* settings_get();
+/// @brief Subscribe to be notified when new settings are being loaded
+/// @param handler Handler to be called when new settings are loaded
+void settings_new_subscribe(NewSettingsHandler);
