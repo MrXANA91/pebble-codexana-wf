@@ -9,6 +9,7 @@
 #include "../gelements/GClock.h"
 #include "../gelements/GEye.h"
 #include "../gelements/GBatteryLvl.h"
+#include "../gelements/GStepTracker.h"
 
 void main_window_push();
 void main_window_destroy();

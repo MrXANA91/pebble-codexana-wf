@@ -7,22 +7,28 @@ static void default_settings() {
     APP_LOG(APP_LOG_LEVEL_INFO, "Default settings");
 
     // Colors
-    s_settings.BackgroundColor = GColorWhite;
-    s_settings.TextColor = GColorBlack;
-    s_settings.EyeColor = PBL_IF_COLOR_ELSE(GColorDarkCandyAppleRed, GColorBlack);
-    s_settings.EyeGrayedColor = GColorLightGray;
-    s_settings.BatteryLevelColor = PBL_IF_COLOR_ELSE(GColorBulgarianRose, GColorDarkGray);
+    s_settings.BackgroundColor = SETTINGS_DEFAULT_BackgroundColor;
+    s_settings.TextColor = SETTINGS_DEFAULT_TextColor;
+    s_settings.EyeColor = SETTINGS_DEFAULT_EyeColor;
+    s_settings.EyeGrayedColor = SETTINGS_DEFAULT_EyeGrayedColor;
+    s_settings.BatteryLevelColor = SETTINGS_DEFAULT_BatteryLevelColor;
+    s_settings.StepCounterColor = SETTINGS_DEFAULT_StepCounterColor;
 
     // XANA Eye
-    s_settings.EyeOnConnected = EYE_MODIFIER_NONE;
-    s_settings.EyeOnDisconnected = EYE_MODIFIER_VOID;
+    s_settings.EyeOnConnected = SETTINGS_DEFAULT_EyeOnConnected;
+    s_settings.EyeOnDisconnected = SETTINGS_DEFAULT_EyeOnDisconnected;
 
     // Battery
-    s_settings.DisplayBatteryPercentage = true;
-    s_settings.DisplayBatteryBar = true;
+    s_settings.DisplayBatteryPercentage = SETTINGS_DEFAULT_DisplayBatteryPercentage;
+    s_settings.DisplayBatteryBar = SETTINGS_DEFAULT_DisplayBatteryBar;
+
+    // Steps
+    s_settings.DisplayStepsCounter = SETTINGS_DEFAULT_DisplayStepsCounter;
+    s_settings.DisplayStepsBar = SETTINGS_DEFAULT_DisplayStepsBar;
+    s_settings.StepsBarMax = SETTINGS_DEFAULT_StepsBarMax;
 
     // Misc
-    s_settings.VibrateOnDisconnect = false;
+    s_settings.VibrateOnDisconnect = SETTINGS_DEFAULT_VibrateOnDisconnect;
 }
 
 static void save_settings() {
@@ -58,14 +64,19 @@ static void prv_inbox_received_handler(DictionaryIterator *iter, void *context) 
     s_settings.EyeColor = GColorFromHEX(eye_color_t->value->int32);
   }
 
+  Tuple *eyeg_color_t = dict_find(iter, MESSAGE_KEY_EyeGrayedColor);
+  if(eyeg_color_t) {
+    s_settings.EyeGrayedColor = GColorFromHEX(eyeg_color_t->value->int32);
+  }
+
   Tuple *bat_lvl_color_t = dict_find(iter, MESSAGE_KEY_BatteryLevelColor);
   if(bat_lvl_color_t) {
     s_settings.BatteryLevelColor = GColorFromHEX(bat_lvl_color_t->value->int32);
   }
 
-  Tuple *eyeg_color_t = dict_find(iter, MESSAGE_KEY_EyeGrayedColor);
-  if(eyeg_color_t) {
-    s_settings.EyeGrayedColor = GColorFromHEX(eyeg_color_t->value->int32);
+  Tuple *steps_bar_color_t = dict_find(iter, MESSAGE_KEY_StepCounterColor);
+  if(steps_bar_color_t) {
+    s_settings.StepCounterColor = GColorFromHEX(steps_bar_color_t->value->int32);
   }
 
   Tuple *dm_color_t = dict_find(iter, MESSAGE_KEY_DarkMode);
@@ -76,11 +87,17 @@ static void prv_inbox_received_handler(DictionaryIterator *iter, void *context) 
     s_settings.EyeColor = darkMode ? GColorWhite : GColorBlack;
     s_settings.EyeGrayedColor = darkMode ? GColorDarkGray : GColorLightGray;
     s_settings.BatteryLevelColor = darkMode ? GColorWhite : GColorBlack;
+    s_settings.StepCounterColor = darkMode ? GColorWhite : GColorBlack;
   }
 
   Tuple *bat_bar_gray_t = dict_find(iter, MESSAGE_KEY_GrayBatteryBar);
   if (bat_bar_gray_t) {
     if (bat_bar_gray_t->value->int32 == 1) s_settings.BatteryLevelColor = GColorDarkGray;
+  }
+
+  Tuple *steps_bar_gray_t = dict_find(iter, MESSAGE_KEY_GrayStepCounter);
+  if (steps_bar_gray_t) {
+    if (steps_bar_gray_t->value->int32 == 1) s_settings.StepCounterColor = GColorDarkGray;
   }
 
   // XANA Eye
@@ -109,6 +126,22 @@ static void prv_inbox_received_handler(DictionaryIterator *iter, void *context) 
   Tuple *bat_bar_t = dict_find(iter, MESSAGE_KEY_DisplayBatteryBar);
   if (bat_bar_t) {
     s_settings.DisplayBatteryBar = bat_bar_t->value->int32 == 1;
+  }
+
+  // Steps
+  Tuple *steps_counter_t = dict_find(iter, MESSAGE_KEY_DisplayStepsCounter);
+  if (steps_counter_t) {
+    s_settings.DisplayStepsCounter = steps_counter_t->value->int32 == 1;
+  }
+
+  Tuple *steps_bar_t = dict_find(iter, MESSAGE_KEY_DisplayStepsBar);
+  if (steps_bar_t) {
+    s_settings.DisplayStepsBar = steps_bar_t->value->int32 == 1;
+  }
+
+  Tuple *steps_bar_max_t = dict_find(iter, MESSAGE_KEY_StepsBarMax);
+  if (steps_bar_max_t) {
+    s_settings.StepsBarMax = steps_bar_max_t->value->int32;
   }
 
   // Misc
