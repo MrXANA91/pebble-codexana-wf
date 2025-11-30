@@ -8,6 +8,7 @@
 #include "gelements/GClock.h"
 #include "gelements/GEye.h"
 #include "gelements/GBatteryLvl.h"
+#include "gelements/GStepTracker.h"
 
 static struct tm *current_time;
 
@@ -18,6 +19,16 @@ static void update_time() {
 
   clock_update(current_time);
   date_update(current_time);
+
+  #ifdef DEBUG
+  const int steps_counter_start = 0;
+  static int fake_steps_counter = steps_counter_start;
+  fake_steps_counter += 50;
+  if (fake_steps_counter > (settings_get()->StepsBarMax + steps_counter_start)) {
+    fake_steps_counter = steps_counter_start;
+  }
+  step_tracker_update(fake_steps_counter);
+  #endif
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
@@ -38,6 +49,26 @@ static void battery_callback(BatteryChargeState batteryCharge) {
   battery_lvl_update(batteryCharge.charge_percent);
 }
 
+static void health_callback(HealthEventType event, void *context) {
+  if (event != HealthEventSignificantUpdate && event != HealthEventMovementUpdate) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Health event (%d) not relevant, ignoring", event);
+    return;
+  }
+
+  HealthMetric metric = HealthMetricStepCount;
+
+  time_t start = time_start_of_today();
+  time_t end = time(NULL);
+  HealthServiceAccessibilityMask mask = health_service_metric_accessible(metric, start, end);
+  if (mask & HealthServiceAccessibilityMaskAvailable) {
+    #ifndef DEBUG
+    step_tracker_update((int)health_service_sum_today(metric));
+    #endif
+  } else {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "HealthMetricStepCount not available");
+  }
+}
+
 static void prv_init(void) {
   main_window_push();
 
@@ -54,6 +85,16 @@ static void prv_init(void) {
   });
   
   battery_state_service_subscribe(battery_callback);
+
+  #ifdef PBL_HEALTH
+  if(!health_service_events_subscribe(health_callback, NULL)) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Health not available!");
+  }
+  #else
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Health not available!");
+  #endif
+
+  // First time init values
 
   update_time();
 

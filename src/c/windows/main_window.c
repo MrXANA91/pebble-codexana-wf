@@ -28,6 +28,10 @@ static void prv_unobstructed_will_change(GRect final_unobstructed_screen_area, v
     clock_layout_update(final_unobstructed_screen_area, true);
     // Move the battery text & rectangle
     battery_lvl_layout_update(final_unobstructed_screen_area, true);
+    // Move the step text & rectangle
+    #ifdef PBL_HEALTH
+    step_tracker_layout_update(final_unobstructed_screen_area, true);
+    #endif
   }
 }
 
@@ -44,6 +48,10 @@ static void prv_unobstructed_did_change(void *context) {
     clock_layout_update(bounds, false);
     // Move the battery text & rectangle
     battery_lvl_layout_update(bounds, false);
+    // Move the step text & rectangle
+    #ifdef PBL_HEALTH
+    step_tracker_layout_update(bounds, false);
+    #endif
   }
 }
 
@@ -59,6 +67,9 @@ static void prv_window_load(Window *window) {
   clock_init(window_layer, bounds);
   date_init(window_layer, bounds);
   battery_lvl_init(window_layer, bounds);
+  #ifdef PBL_HEALTH
+  step_tracker_init(window_layer, bounds);
+  #endif
 
   prv_apply_settings(settings_get());
   prv_unobstructed_will_change(bounds, NULL);
@@ -69,6 +80,9 @@ static void prv_window_unload(Window *window) {
   clock_deinit();
   eye_deinit();
   battery_lvl_deinit();
+  #ifdef PBL_HEALTH
+  step_tracker_deinit();
+  #endif
 }
 
 static void prv_apply_settings(ClaySettings *settings) {
@@ -83,6 +97,11 @@ static void prv_apply_settings(ClaySettings *settings) {
 
     // Battery
     battery_lvl_apply_settings(settings);
+
+    // Steps
+    #ifdef PBL_HEALTH
+    step_tracker_apply_settings(settings);
+    #endif
 }
 
 void main_window_push() {

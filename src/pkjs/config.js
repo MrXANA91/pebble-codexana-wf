@@ -46,6 +46,13 @@ module.exports = [
         "capabilities": [ "COLOR" ]
       },
       {
+        "type": "color",
+        "messageKey": "GrayStepCounter",
+        "defaultValue": "0x000055",
+        "label": "Steps Counter Color",
+        "capabilities": [ "COLOR", "HEALTH" ]
+      },
+      {
         "type": "toggle",
         "messageKey": "DarkMode",
         "defaultValue": false,
@@ -59,6 +66,14 @@ module.exports = [
         "label": "Gray Battery Bar Level",
         "capabilities": [ "BW" ],
         "description": "Enable this to set the battery bar color to gray. If disabled, color will be same as text"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "GrayStepCounter",
+        "defaultValue": true,
+        "label": "Gray Steps Bar Counter",
+        "capabilities": [ "BW", "HEALTH" ],
+        "description": "Enable this to set the steps bar color to gray. If disabled, color will be same as text"
       }
     ]
   },
@@ -101,6 +116,37 @@ module.exports = [
         "messageKey": "DisplayBatteryBar",
         "label": "Display Battery Bar",
         "defaultValue": true
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "capabilities": [ "HEALTH" ],
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Steps"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "DisplayStepsCounter",
+        "label": "Display Steps Counter",
+        "defaultValue": true
+      },
+      {
+        "type": "toggle",
+        "messageKey": "DisplayStepsBar",
+        "label": "Display Steps Bar",
+        "defaultValue": true
+      },
+      {
+        "type": "slider",
+        "messageKey": "StepsBarMax",
+        "label": "Steps Bar Max",
+        "defaultValue": 5000,
+        "step": 100,
+        "min": 100,
+        "max": 50000
       }
     ]
   },

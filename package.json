@@ -33,16 +33,21 @@
       "EyeColor",
       "EyeGrayedColor",
       "BatteryLevelColor",
+      "StepCounterColor",
       "DarkMode",
       "GrayBatteryBar",
+      "GrayStepCounter",
       "VoidOnDisconnect",
       "GrayOnDisconnect",
       "DisplayBatteryPercentage",
       "DisplayBatteryBar",
+      "DisplayStepsCounter",
+      "DisplayStepsBar",
+      "StepsBarMax",
       "VibrateOnDisconnect"
     ],
     "capabilities": [
-      "configurable"
+      "configurable", "health"
     ],
     "resources": {
       "media": [
@@ -56,13 +61,13 @@
         {
           "type": "font",
           "name": "FONT_GUNSHIP_33",
-          "file": "fonts/gunship.ttf",
+          "file": "fonts/gunshipmod.ttf",
           "compatibilty": "2.7"
         },
         {
           "type": "font",
           "name": "FONT_GUNSHIP_26",
-          "file": "fonts/gunship.ttf",
+          "file": "fonts/gunshipmod.ttf",
           "compatibilty": "2.7"
         },
         {
