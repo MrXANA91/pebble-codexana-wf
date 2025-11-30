@@ -44,11 +44,16 @@ void step_tracker_init(Layer* window_layer, GRect bounds) {
 }
 
 void step_tracker_update(int steps) {
+    #ifdef FAKE_STEP_COUNTERS
+    s_steps = FAKE_STEP_COUNTERS;
+    #else
+    s_steps = steps;
+    #endif
+
     static char buffer[8];
-    snprintf(buffer, 8, "%d", steps);
+    snprintf(buffer, 8, "%d", s_steps);
     text_layer_set_text(s_step_text_layer, buffer);
 
-    s_steps = steps;
     layer_mark_dirty(s_step_layer);
 }
 

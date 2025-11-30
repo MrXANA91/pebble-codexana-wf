@@ -39,10 +39,8 @@
       "GrayStepCounter",
       "VoidOnDisconnect",
       "GrayOnDisconnect",
-      "DisplayBatteryPercentage",
-      "DisplayBatteryBar",
-      "DisplayStepsCounter",
-      "DisplayStepsBar",
+      "DisplayBattery",
+      "DisplaySteps",
       "StepsBarMax",
       "VibrateOnDisconnect"
     ],

@@ -47,7 +47,7 @@ module.exports = [
       },
       {
         "type": "color",
-        "messageKey": "GrayStepCounter",
+        "messageKey": "StepCounterColor",
         "defaultValue": "0x000055",
         "label": "Steps Counter Color",
         "capabilities": [ "COLOR", "HEALTH" ]
@@ -107,14 +107,8 @@ module.exports = [
       },
       {
         "type": "toggle",
-        "messageKey": "DisplayBatteryPercentage",
-        "label": "Display Battery Percentage",
-        "defaultValue": true
-      },
-      {
-        "type": "toggle",
-        "messageKey": "DisplayBatteryBar",
-        "label": "Display Battery Bar",
+        "messageKey": "DisplayBattery",
+        "label": "Display Battery",
         "defaultValue": true
       }
     ]
@@ -129,14 +123,8 @@ module.exports = [
       },
       {
         "type": "toggle",
-        "messageKey": "DisplayStepsCounter",
-        "label": "Display Steps Counter",
-        "defaultValue": true
-      },
-      {
-        "type": "toggle",
-        "messageKey": "DisplayStepsBar",
-        "label": "Display Steps Bar",
+        "messageKey": "DisplaySteps",
+        "label": "Display Steps",
         "defaultValue": true
       },
       {

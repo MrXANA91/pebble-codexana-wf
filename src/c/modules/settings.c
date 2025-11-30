@@ -118,25 +118,17 @@ static void prv_inbox_received_handler(DictionaryIterator *iter, void *context) 
   }
 
   // Battery
-  Tuple *bat_percent_t = dict_find(iter, MESSAGE_KEY_DisplayBatteryPercentage);
+  Tuple *bat_percent_t = dict_find(iter, MESSAGE_KEY_DisplayBattery);
   if (bat_percent_t) {
     s_settings.DisplayBatteryPercentage = bat_percent_t->value->int32 == 1;
-  }
-
-  Tuple *bat_bar_t = dict_find(iter, MESSAGE_KEY_DisplayBatteryBar);
-  if (bat_bar_t) {
-    s_settings.DisplayBatteryBar = bat_bar_t->value->int32 == 1;
+    s_settings.DisplayBatteryBar = bat_percent_t->value->int32 == 1;
   }
 
   // Steps
-  Tuple *steps_counter_t = dict_find(iter, MESSAGE_KEY_DisplayStepsCounter);
+  Tuple *steps_counter_t = dict_find(iter, MESSAGE_KEY_DisplaySteps);
   if (steps_counter_t) {
     s_settings.DisplayStepsCounter = steps_counter_t->value->int32 == 1;
-  }
-
-  Tuple *steps_bar_t = dict_find(iter, MESSAGE_KEY_DisplayStepsBar);
-  if (steps_bar_t) {
-    s_settings.DisplayStepsBar = steps_bar_t->value->int32 == 1;
+    s_settings.DisplayStepsBar = steps_counter_t->value->int32 == 1;
   }
 
   Tuple *steps_bar_max_t = dict_find(iter, MESSAGE_KEY_StepsBarMax);
