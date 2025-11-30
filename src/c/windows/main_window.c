@@ -19,6 +19,7 @@ static void prv_adjust_fullbounds_for_round(GRect *bounds) {
 
 static void prv_unobstructed_will_change(GRect final_unobstructed_screen_area, void *context) {
   GRect full_bounds = layer_get_bounds(window_get_root_layer(s_window));
+  prv_adjust_fullbounds_for_round(&full_bounds);
   if (!grect_equal(&full_bounds, &final_unobstructed_screen_area)) {
     // Screen is about to become obstructed, hide the date
     date_layout_update(final_unobstructed_screen_area, true);
