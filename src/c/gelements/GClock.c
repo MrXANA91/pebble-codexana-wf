@@ -8,7 +8,7 @@ static TextLayer *s_time_dminutes_layer;
 static TextLayer *s_time_minutes_layer;
 
 void clock_init(Layer* window_layer, GRect bounds) {
-  s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GUNSHIP_33));
+  s_time_font = fonts_load_custom_font(resource_get_handle(PBL_IF_EMERY_ELSE(RESOURCE_ID_FONT_GUNSHIP_42,RESOURCE_ID_FONT_GUNSHIP_33)));
   s_time_dhours_layer = text_layer_create(GRect_DHours(bounds));
   text_layer_set_font(s_time_dhours_layer, s_time_font);
   text_layer_set_text_alignment(s_time_dhours_layer, GTextAlignmentCenter);

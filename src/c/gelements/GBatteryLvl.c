@@ -31,7 +31,7 @@ static void prv_battery_rect_update_proc(Layer *layer, GContext *ctx) {
 }
 
 void battery_lvl_init(Layer* window_layer, GRect bounds) {
-  s_battery_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GUNSHIP_15));
+  s_battery_font = fonts_load_custom_font(resource_get_handle(PBL_IF_EMERY_ELSE(RESOURCE_ID_FONT_GUNSHIP_18, RESOURCE_ID_FONT_GUNSHIP_15)));
   s_battery_text_layer = text_layer_create(GRect_BatText(bounds));
   text_layer_set_font(s_battery_text_layer, s_battery_font);
   text_layer_set_text_alignment(s_battery_text_layer, GTextAlignmentRight);

@@ -22,7 +22,8 @@
       "aplite",
       "basalt",
       "chalk",
-      "diorite"
+      "diorite",
+      "emery"
     ],
     "watchapp": {
       "watchface": true
@@ -58,6 +59,18 @@
         },
         {
           "type": "font",
+          "name": "FONT_GUNSHIP_48",
+          "file": "fonts/gunshipmod.ttf",
+          "compatibilty": "2.7"
+        },
+        {
+          "type": "font",
+          "name": "FONT_GUNSHIP_42",
+          "file": "fonts/gunshipmod.ttf",
+          "compatibilty": "2.7"
+        },
+        {
+          "type": "font",
           "name": "FONT_GUNSHIP_33",
           "file": "fonts/gunshipmod.ttf",
           "compatibilty": "2.7"
@@ -66,6 +79,12 @@
           "type": "font",
           "name": "FONT_GUNSHIP_26",
           "file": "fonts/gunshipmod.ttf",
+          "compatibilty": "2.7"
+        },
+        {
+          "type": "font",
+          "name": "FONT_GUNSHIP_18",
+          "file": "fonts/gunship.ttf",
           "compatibilty": "2.7"
         },
         {
@@ -83,6 +102,16 @@
           "type": "bitmap",
           "name": "XANA_VOID",
           "file": "images/xana_void_57x91.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "XANA_BIG",
+          "file": "images/xana_144x168.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "XANA_BIG_VOID",
+          "file": "images/xana_void_144x168.png"
         }
       ]
     }
