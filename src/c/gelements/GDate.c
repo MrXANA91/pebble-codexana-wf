@@ -4,7 +4,7 @@ static GFont s_date_font;
 static TextLayer *s_date_layer;
 
 void date_init(Layer* window_layer, GRect bounds) {
-  s_date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GUNSHIP_26));
+  s_date_font = fonts_load_custom_font(resource_get_handle(PBL_IF_EMERY_ELSE(RESOURCE_ID_FONT_GUNSHIP_33,RESOURCE_ID_FONT_GUNSHIP_26)));
   s_date_layer = text_layer_create(GRect_Date(bounds));
   text_layer_set_font(s_date_layer, s_date_font);
   text_layer_set_text_alignment(s_date_layer, GTextAlignmentCenter);

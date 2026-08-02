@@ -7,10 +7,12 @@
 // #define FAKE_STEP_COUNTERS  1896
 // #define FAKE_STEP_COUNTERS  5039
 
-#define TIME_TEXT_HEIGHT  40
+#define PBL_IF_EMERY_ELSE(if_true,if_false) (PBL_PLATFORM_TYPE_CURRENT == PlatformTypeEmery ? if_true : if_false)
+
+#define TIME_TEXT_HEIGHT  PBL_IF_EMERY_ELSE(50,40)
 #define DATE_TEXT_HEIGHT  40
 #define BATT_TEXT_HEIGHT  20
-#define BATT_RECT_HEIGHT  PBL_IF_ROUND_ELSE(60,70)
+#define BATT_RECT_HEIGHT  PBL_IF_ROUND_ELSE(60,PBL_IF_EMERY_ELSE(120,70))
 #define STEP_TEXT_HEIGHT  BATT_TEXT_HEIGHT
 #define STEP_RECT_HEIGHT  BATT_RECT_HEIGHT
 
@@ -20,10 +22,10 @@
 #define GRect_XANA_obstructed(bounds) GRect(bounds.origin.x + 1, bounds.origin.y, bounds.size.w - 1, gbitmap_get_bounds(s_xana_bitmap).size.h)
 
 #define GRect_DHours(bounds) GRect(bounds.origin.x, bounds.origin.y + bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
-#define GRect_Hours(bounds) GRect(bounds.origin.x + ((bounds.size.w / 2) - 5) / 2, bounds.origin.y + bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
-#define GRect_Colon(bounds) GRect(bounds.origin.x + (bounds.size.w / 2) - 5, bounds.origin.y + bounds.size.h - TIME_TEXT_HEIGHT, 10, TIME_TEXT_HEIGHT)
-#define GRect_DMinutes(bounds) GRect(bounds.origin.x + (bounds.size.w / 2) + 5, bounds.origin.y + bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
-#define GRect_Minutes(bounds) GRect(bounds.origin.x + (bounds.size.w / 2) + 5 + ((bounds.size.w / 2) - 5) / 2, bounds.origin.y + bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
+#define GRect_Hours(bounds) GRect(bounds.origin.x + ((bounds.size.w / 2) - PBL_IF_EMERY_ELSE(10,5)) / 2, bounds.origin.y + bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
+#define GRect_Colon(bounds) GRect(bounds.origin.x + (bounds.size.w / 2) - PBL_IF_EMERY_ELSE(10,5), bounds.origin.y + bounds.size.h - TIME_TEXT_HEIGHT, PBL_IF_EMERY_ELSE(20,10), TIME_TEXT_HEIGHT)
+#define GRect_DMinutes(bounds) GRect(bounds.origin.x + (bounds.size.w / 2) + PBL_IF_EMERY_ELSE(10,5), bounds.origin.y + bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
+#define GRect_Minutes(bounds) GRect(bounds.origin.x + (bounds.size.w / 2) + PBL_IF_EMERY_ELSE(10,5) + ((bounds.size.w / 2) - 5) / 2, bounds.origin.y + bounds.size.h - TIME_TEXT_HEIGHT, ((bounds.size.w / 2) - 5) / 2, TIME_TEXT_HEIGHT)
 
 #define GRect_BatText(bounds) GRect(bounds.origin.x + (bounds.size.w / 2), bounds.origin.y + DATE_TEXT_HEIGHT - PBL_IF_ROUND_ELSE(15,5), bounds.size.w / 2, BATT_TEXT_HEIGHT)
 #define GRect_BatText_obstructed(bounds) GRect(bounds.origin.x + (bounds.size.w / 2), bounds.origin.y, bounds.size.w / 2, BATT_TEXT_HEIGHT)
