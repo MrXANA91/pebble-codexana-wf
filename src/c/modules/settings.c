@@ -101,14 +101,6 @@ static void prv_inbox_received_handler(DictionaryIterator *iter, void *context) 
   }
 
   // XANA Eye
-  Tuple *void_on_disconnect_t = dict_find(iter, MESSAGE_KEY_VoidOnDisconnect);
-  if(void_on_disconnect_t) {
-    s_settings.EyeOnDisconnected &= ~(EYE_MODIFIER_VOID);
-    if (void_on_disconnect_t->value->int32 == 1) {
-      s_settings.EyeOnDisconnected |= EYE_MODIFIER_VOID;
-    }
-  }
-
   Tuple *gray_on_disconnect_t = dict_find(iter, MESSAGE_KEY_GrayOnDisconnect);
   if(gray_on_disconnect_t) {
     s_settings.EyeOnDisconnected &= ~(EYE_MODIFIER_GRAY);

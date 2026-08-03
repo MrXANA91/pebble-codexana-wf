@@ -86,12 +86,6 @@ module.exports = [
       },
       {
         "type": "toggle",
-        "messageKey": "VoidOnDisconnect",
-        "label": "Central circles disappear on lost connection",
-        "defaultValue": true
-      },
-      {
-        "type": "toggle",
         "messageKey": "GrayOnDisconnect",
         "label": "Gray out on lost connection",
         "defaultValue": false

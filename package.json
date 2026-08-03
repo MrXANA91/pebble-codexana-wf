@@ -38,7 +38,6 @@
       "DarkMode",
       "GrayBatteryBar",
       "GrayStepCounter",
-      "VoidOnDisconnect",
       "GrayOnDisconnect",
       "DisplayBattery",
       "DisplaySteps",
@@ -100,18 +99,8 @@
         },
         {
           "type": "bitmap",
-          "name": "XANA_VOID",
-          "file": "images/xana_void_57x91.png"
-        },
-        {
-          "type": "bitmap",
           "name": "XANA_BIG",
-          "file": "images/xana_144x168.png"
-        },
-        {
-          "type": "bitmap",
-          "name": "XANA_BIG_VOID",
-          "file": "images/xana_void_144x168.png"
+          "file": "images/xana_146x146.png"
         }
       ]
     }

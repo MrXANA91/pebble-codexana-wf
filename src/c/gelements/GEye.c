@@ -2,9 +2,7 @@
 
 static BitmapLayer *s_xana_layer;
 static GBitmap *s_xana_bitmap;
-static GBitmap *s_xana_void_bitmap;
 static GColor *s_xana_color;
-static GColor *s_xana_void_color;
 
 /// @brief Get the pointer to the black color in the bitmap palette
 /// @param palette 
@@ -57,9 +55,7 @@ static void prv_get_black_palette(GColor **palette_ptr_ptr, GBitmap* bitmap) {
 
 void eye_init(Layer* window_layer, GRect bounds) {
   s_xana_bitmap = gbitmap_create_with_resource(PBL_IF_EMERY_ELSE(RESOURCE_ID_XANA_BIG,RESOURCE_ID_XANA));
-  s_xana_void_bitmap = gbitmap_create_with_resource(PBL_IF_EMERY_ELSE(RESOURCE_ID_XANA_BIG_VOID,RESOURCE_ID_XANA_VOID));
   prv_get_black_palette(&s_xana_color, s_xana_bitmap);
-  prv_get_black_palette(&s_xana_void_color, s_xana_void_bitmap);
   s_xana_layer = bitmap_layer_create(GRect_XANA_default(bounds));
   bitmap_layer_set_bitmap(s_xana_layer, s_xana_bitmap);
   bitmap_layer_set_compositing_mode(s_xana_layer, GCompOpSet);
@@ -82,18 +78,10 @@ void eye_update(bool connected) {
     layer_set_hidden(bitmap_layer_get_layer(s_xana_layer), false);
   }
 
-  if ((modifiers & EYE_MODIFIER_VOID) != 0) {
-    bitmap_layer_set_bitmap(s_xana_layer, s_xana_void_bitmap);
-  } else {
-    bitmap_layer_set_bitmap(s_xana_layer, s_xana_bitmap);
-  }
-
   if ((modifiers & EYE_MODIFIER_GRAY) != 0) {
     if (s_xana_color) *s_xana_color = settings->EyeGrayedColor;
-    if (s_xana_void_color) *s_xana_void_color = settings->EyeGrayedColor;
   } else {
     if (s_xana_color) *s_xana_color = settings->EyeColor;
-    if (s_xana_void_color) *s_xana_void_color = settings->EyeColor;
   }
 }
 
@@ -108,6 +96,5 @@ void eye_layout_update(GRect bounds, bool obstructed) {
 
 void eye_deinit() {
   gbitmap_destroy(s_xana_bitmap);
-  gbitmap_destroy(s_xana_void_bitmap);
   bitmap_layer_destroy(s_xana_layer);
 }

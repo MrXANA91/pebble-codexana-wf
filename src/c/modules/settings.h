@@ -11,7 +11,7 @@
 #define SETTINGS_DEFAULT_BatteryLevelColor           PBL_IF_COLOR_ELSE(GColorBulgarianRose, GColorDarkGray)
 #define SETTINGS_DEFAULT_StepCounterColor            PBL_IF_COLOR_ELSE(GColorOxfordBlue, GColorDarkGray)
 #define SETTINGS_DEFAULT_EyeOnConnected              EYE_MODIFIER_NONE
-#define SETTINGS_DEFAULT_EyeOnDisconnected           EYE_MODIFIER_VOID
+#define SETTINGS_DEFAULT_EyeOnDisconnected           EYE_MODIFIER_GRAY
 #define SETTINGS_DEFAULT_DisplayBatteryPercentage    true
 #define SETTINGS_DEFAULT_DisplayBatteryBar           true
 #define SETTINGS_DEFAULT_DisplayStepsCounter         true
@@ -22,8 +22,7 @@
 typedef enum {
     EYE_MODIFIER_NONE = 0,
     EYE_MODIFIER_HIDE = 0x01,
-    EYE_MODIFIER_VOID = 0x02,
-    EYE_MODIFIER_GRAY = 0x04,
+    EYE_MODIFIER_GRAY = 0x02,
 } EyeModifiersEnum_t;
 
 typedef struct {
